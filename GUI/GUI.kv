@@ -1,0 +1,187 @@
+<GestureBox>:
+    id: gesture_box
+    disabled: False
+
+<HeaderIcon>:
+    size_hint_x: None
+    width: 55
+    size_hint_y: None
+    height: 35
+    top: root.top
+
+<Header>:
+    id: gen_header
+    cols: 2
+    size_hint_y: None
+    opacity: 1
+    height: 50
+    FloatLayout:
+        id: left
+        canvas.before:
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                source: "D:\Projects\Halo Controller\GUI Icons\Cockpit Corner TL.png"
+    BoxLayout:
+        id: right
+        padding: [45, 5, 5, 10]
+        spacing: 10
+        canvas:
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                source: "D:\Projects\Halo Controller\GUI Icons\Cockpit Corner TR.png"
+        HeaderIcon:
+            id: gps
+            canvas:
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+                    id: gps_icon
+                    source: root.get_gps_connection()
+            Label:
+                font_size: 15
+                text: "4"
+        HeaderIcon:
+            id: connection
+            canvas:
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+                    id: drone_connection
+                    source: root.get_drone_connection()
+        HeaderIcon:
+            id: battery
+            height: 29
+            canvas:
+                Color:
+                    rgba: root.battery_level_color
+                Rectangle:
+                    size: self.width - (16 + root.battery_conversion_factor), self.height - 9  # Default is -16, -9
+                    pos: self.x + (12 + root.battery_conversion_factor), self.y + 5  # Default is +12, +5
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+                    id: battery_level
+                    source: "D:\Projects\Halo Controller\GUI Icons\Battery Level Indicator.png"
+
+
+<Footer>:
+    id: gen_footer
+    size_hint_y: None
+    height: 50
+    opacity: 1
+    orientation: "horizontal"
+    canvas:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    Button:
+        text: "Previous"
+        on_press: root.previous_screen()
+    Button:
+        text: "Next"
+        on_press:
+
+<FlightStats>:
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    name: 'Flight_Stats'
+    Header:
+        id: fs_header
+        top: root.height
+        opacity: 1
+    Footer:
+        id: fs_footer
+        opacity: 1
+
+<ToolBar>:
+
+<Map>:
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    name: 'Map'
+    MapView:
+        lat: 50.6394
+        lon: 3.057
+        zoom: 13
+    Header:
+        id: fs_header
+        top: root.height
+        opacity: 1
+    Footer:
+        id: fs_footer
+        opacity: 1
+    GestureBox:
+        disabled: True
+
+<Video>:
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    name: 'Video'
+    Header:
+        id: fs_header
+        top: root.height
+        opacity: 1
+    Footer:
+        id: fs_footer
+        opacity: 1
+
+
+<Diagnostics>:
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    name: 'Diagnostics'
+    Footer:
+
+<SettingsButton>
+    size_hint_y: None
+    height: 40
+
+<SettingsLabel>
+    size_hint_y: None
+    height: 40
+    color: root.text_color
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+<SettingsSwitch>
+    size_hint_y: None
+    height: 40
+
+<Settings>:
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    name: 'Settings'
+    ScrollView:
+        GridLayout:
+            size_hint_y: None
+            height: self.minimum_height
+            cols: 2
+    Footer:
