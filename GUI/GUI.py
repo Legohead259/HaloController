@@ -24,7 +24,7 @@ from util import *
 
 colors = Colors()
 
-loc = "D:\Projects\HaloController\Settings.json"
+loc = "C:\Users\Duffy\PycharmProjects\HaloController\Settings.json"
 with open(loc) as settings_file:
     settings = json.load(settings_file)
 
@@ -229,6 +229,12 @@ class Header(GridLayout):
     disabled = False
     battery_conversion_factor = None
     battery_level_color = None
+    left_image = "C:\Users\Duffy\PycharmProjects\HaloController\GUI\icons\Cockpit Corner TL.png"
+    # TODO: Make for relative path
+    right_image = "C:\Users\Duffy\PycharmProjects\HaloController\GUI\icons\Cockpit Corner TR.png"
+    # TODO: Make for relative path
+    battery_image = "C:\Users\Duffy\PycharmProjects\HaloController\GUI\icons\Battery Level Indicator.png"
+    # TODO: Make for relative path
 
     def __init__(self, **kwargs):
         super(Header, self).__init__(**kwargs)
@@ -241,7 +247,7 @@ class Header(GridLayout):
         :return: Number of GPS satellites currently being received by the controller
         """
         # TODO: Implement gps connection code
-        return "D:\Projects\HaloController\GUI\Icons\GPS Icon.png"
+        return "C:\Users\Duffy\PycharmProjects\HaloController\GUI\Icons\GPS Icon.png"
         # TODO: Change to read from the file path dynamically
 
     @staticmethod
@@ -251,7 +257,7 @@ class Header(GridLayout):
         :return: Number of GPS satellites currently being received by the drone
         """
         # TODO: Implement gps connection code
-        return "D:\Projects\HaloController\GUI\Icons\GPS Icon.png"
+        return "C:\Users\Duffy\PycharmProjects\HaloController\GUI\Icons\GPS Icon.png"
         # TODO: Change to read from the file path dynamically
 
     @staticmethod
@@ -261,7 +267,7 @@ class Header(GridLayout):
         :return: The connection between the controller and the drone
         """
         # TODO: Implement drone connection code
-        return "D:\Projects\HaloController\GUI\Icons\Connection Icon Full.png"
+        return "C:\Users\Duffy\PycharmProjects\HaloController\GUI\Icons\Connection Icon Full.png"
         # TODO: Change to read from the file path dynamically
 
     @staticmethod

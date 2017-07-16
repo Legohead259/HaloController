@@ -1,6 +1,6 @@
 import json
 
-loc = "D:\Projects\HaloController\Settings.json"
+loc = "C:\Users\Duffy\PycharmProjects\HaloController\Settings.json"
 with open(loc) as settings_file:
     settings = json.load(settings_file)
 
