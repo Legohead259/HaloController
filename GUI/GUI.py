@@ -36,6 +36,7 @@ sm = ScreenManager()
 cur_screen = 0
 
 coord_enabled = False
+zoom = settings["pages"]["map"]["defaults"]["zoom"]
 
 
 # -----END INITIALIZATION-----
@@ -65,9 +66,11 @@ def previous_screen():
         print "Switching to: " + sm.current  # Debug
 
 
-def update_json(l):
-
-    with open(l, "w") as settings_file_w:
+def update_settings():
+    """
+    Updates the settings json
+    """
+    with open(loc, "w") as settings_file_w:
         json.dump(settings, settings_file_w, indent=4)
 
 
@@ -77,16 +80,31 @@ def update_json(l):
 
 
 class Background(Screen):
+    """
+    This class will run in the background of all screens on the GUI.
+    During development, keyboard inputs will be substituted for the actual controller inputs.
+    When properly implemented, this class will check for inputs from all of the inputs and adjust the screen accordingly
+    """
+
+    # TODO: Update to handle keyboard (during dev) and controller board (during deployment) inputs
+    # TODO: Update to automatically switch between keyboard and controller board inputs
+
     def __init__(self, **kwargs):
         super(Screen, self).__init__()
         self.keyboard = Window.request_keyboard(self.keyboard_closed, self)
         self.keyboard.bind(on_key_down=self.on_keyboard_down)
 
     def keyboard_closed(self):
+        """
+        Method for closing keyboard connection to GUI
+        """
         self.keyboard.unbind(on_key_down=self.on_keyboard_down)
         self.keyboard = None
 
     def on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        """
+        Method for when the key on the keyboard is pressed.
+        """
         if keycode[1] == "left":
             previous_screen()
             # print "left"  # Debug
@@ -97,6 +115,12 @@ class Background(Screen):
             global coord_enabled
             coord_enabled = not coord_enabled
             # print coord_enabled  # Debug
+        elif keycode[1] == "z":
+            global zoom
+            zoom += 1
+        elif keycode[1] == "x":
+            global zoom
+            zoom -= 1
         return True
 
 
@@ -281,12 +305,21 @@ class HeaderIcon(Icon):
 
 
 class Footer(BoxLayout):
+    """
+    Footer of the GUI.
+    The speed (x, y, and z), acceleration, coordinates, and other misc. flight stats will be displayed here
+    """
+    # TODO: Implement getting and displaying speed, acceleration, coordinates, and other misc flight stats
     text_color = colors.black
     background_color = colors.thanics_blue
     disabled = False
 
 
 class FlightStats(Screen):
+    """
+    Screen that will have a 3D render of the drone properly orientated relative to the controller (yaw) and zeroes.
+    The drone will be rendered with an arrow pointed forward and its motion will all be rendered in real-time.
+    """
     text_color = colors.black
     background_color = colors.white
     header_enabled = settings["pages"]["flight_stats"]["header"]
@@ -294,31 +327,18 @@ class FlightStats(Screen):
     footer_enabled = settings["pages"]["flight_stats"]["footer"]
     # print(footer_enabled)  # Debug
 
-    def __init__(self, **kwargs):
-        super(Screen, self).__init__()
-        self.update()
-        self.keyboard = Window.request_keyboard(self.keyboard_closed, self)
-        self.keyboard.bind(on_key_down=self.on_keyboard_down)
-
-    def keyboard_closed(self):
-        self.keyboard.unbind(on_key_down=self.on_keyboard_down)
-        self.keyboard = None
-
-    def on_keyboard_down(self, keyboard, keycode, text, modifiers):
-        if keycode[1] == 'w':
-            print 'w'
-        elif keycode[1] == 's':
-            print 's'
-        elif keycode[1] == 'up':
-            print 'up'
-        elif keycode[1] == 'down':
-            print 'down'
-        return True
-
     def update(self):
+        """
+        Updates the axes of motion and the 3D render
+        """
+        # TODO: Implement
         pass
 
     def update_hf(self):
+        """
+        Enables or disables the header and footer based on user preference
+        """
+        # TODO: Better Implement
         if self.header_enabled:
             self.ids.FlightStats.header.opacity = 1
         else:
@@ -331,56 +351,66 @@ class FlightStats(Screen):
 
 
 class MapScr(Screen):
+    """
+    The map screen of the controller.
+    A local map is rendered and displayed that the user can zoom, pan, and select different coordinates on.
+    Upon first run of the controller, the user can enable or disable auto updates.
+    With auto-updates, the controller will get its own coordinates and generate a map that renders a user-defined
+        radius around the controller's current location.
+    Without auto-updates, the user will have to pre-load coordinates for the controller to render.
+    Relative tracking will allow users to track their drone relative to the controller (themselves).
+    However, a phone must be plugged in for this feature to be enabled (this can be overridden in settings).
+    If the controller or the drone are marked in the default location (Tesla's Headquarters in Palo Alto, CA), please
+        check that the GPS unit on your phone/drone are functioning properly.
+    """
     text_color = colors.black
     background_color = colors.white
     header_enabled = settings["pages"]["map"]["header"]
     # print(header_enabled)  # Debug
     footer_enabled = settings["pages"]["map"]["footer"]
     # print(footer_enabled)  # Debug
-    zoom = 16
-    con_lat = 39
-    con_lon = -77
-    drone_lat = 39
-    drone_lon = -77
+    con_lat = settings["pages"]["map"]["defaults"]["lat"]
+    con_lon = settings["pages"]["map"]["defaults"]["lon"]
+    drone_lat = settings["pages"]["map"]["defaults"]["lat"]
+    drone_lon = settings["pages"]["map"]["defaults"]["lon"]
+    zoom = zoom
 
     def __init__(self, **kwargs):
         super(Screen, self).__init__()
         self.update()
-        self.keyboard = Window.request_keyboard(self.keyboard_closed, self)
-        self.keyboard.bind(on_key_down=self.on_keyboard_down)
-
-    def keyboard_closed(self):
-        self.keyboard.unbind(on_key_down=self.on_keyboard_down)
-        self.keyboard = None
-
-    def on_keyboard_down(self, keyboard, keycode, text, modifiers):
-        if keycode[1] == 'w':
-            print 'w'
-        elif keycode[1] == 's':
-            print 's'
-        elif keycode[1] == 'up':
-            print 'up'
-        elif keycode[1] == 'down':
-            print 'down'
-        return True
 
     def get_cur_con_lat(self):
+        """
+        Gets the current latitude of the controller
+        """
         # TODO: Implement getting current controller latitude
         return 39
 
     def get_cur_con_lon(self):
+        """
+        Gets the current longitude of the controller
+        """
         # TODO: Implement getting current controller longitude
         return -77
 
     def get_cur_drone_lat(self):
+        """
+        Gets the current latitude of the drone
+        """
         # TODO: Implement getting current drone latitude
         return 39
 
     def get_cur_drone_lon(self):
+        """
+        Gets the current longitude of the drone
+        """
         # TODO: Implement getting current drone longitude
         return -77
 
     def update_hf(self):
+        """
+        Enables or disables the header and footer based on user preference
+        """
         if self.header_enabled:
             self.ids.FlightStats.header.opacity = 1
         else:
@@ -396,11 +426,14 @@ class MapScr(Screen):
         return 16
 
     def update(self):
-        self.zoom = self.update_zoom()
         self.con_lat = self.get_cur_con_lat()
+        # print self.con_lat  # Debug
         self.con_lon = self.get_cur_con_lon()
+        # print self.con_lon  # Debug
         self.drone_lat = self.get_cur_drone_lat()
+        # print self.drone_lat  # Debug
         self.drone_lon = self.get_cur_drone_lon()
+        # print self.drone_lon  # Debug
 
 
 class Map(MapView):
@@ -471,15 +504,20 @@ class Settings(Screen):
     settings = settings
 
     @staticmethod
-    def update_settings():
+    def settings_popup():
         confirm_button = Button(text="Confirm Changes")
         popup = Popup(content=confirm_button, title="")
         confirm_button.bind(on_press=popup.dismiss)
-        confirm_button.bind(on_press=update_json(loc))
+        confirm_button.bind(on_press=update_settings())
         popup.open()
 
+fs = FlightStats()
+m = MapScr()
+v = Video()
+d = Diagnostics()
+s = Settings()
 
-screens = [FlightStats(), MapScr(), Video(), Diagnostics(), Settings()]
+screens = [fs, m, v, d, s]
 
 
 class GUIApp(App):

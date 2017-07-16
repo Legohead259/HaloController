@@ -8,7 +8,11 @@
     }, 
     "pages": {
         "map": {
-            "zoom": 13,
+            "defaults": {
+              "zoom": 16,
+              "lat": 37.3947057,
+              "lon": -122.1503251
+            },
             "maneuvers": false, 
             "scale": true, 
             "alt_bar": true, 
