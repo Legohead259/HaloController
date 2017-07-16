@@ -8,6 +8,7 @@
     }, 
     "pages": {
         "map": {
+            "zoom": 13,
             "maneuvers": false, 
             "scale": true, 
             "alt_bar": true, 

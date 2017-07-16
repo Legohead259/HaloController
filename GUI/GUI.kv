@@ -1,3 +1,5 @@
+<Background>:
+
 <GestureBox>:
     id: gesture_box
     disabled: False
@@ -15,13 +17,22 @@
     size_hint_y: None
     opacity: 1
     height: 50
-    FloatLayout:
+    GridLayout:
         id: left
+        cols: 1
         canvas.before:
             Rectangle:
                 size: self.size
                 pos: self.pos
-                source: "D:\Projects\Halo Controller\GUI Icons\Cockpit Corner TL.png"
+                source: "D:\Projects\HaloController\GUI\Icons\Cockpit Corner TL.png"
+        HeaderIcon:
+            id: con_gps
+            canvas:
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+                    id: gps_icon
+                    source: root.get_drone_gps_connection()
     BoxLayout:
         id: right
         padding: [45, 5, 5, 10]
@@ -30,18 +41,15 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-                source: "D:\Projects\Halo Controller\GUI Icons\Cockpit Corner TR.png"
+                source: "D:\Projects\HaloController\GUI\Icons\Cockpit Corner TR.png"
         HeaderIcon:
-            id: gps
+            id: con_gps
             canvas:
                 Rectangle:
                     size: self.size
                     pos: self.pos
                     id: gps_icon
-                    source: root.get_gps_connection()
-            Label:
-                font_size: 15
-                text: "4"
+                    source: root.get_con_gps_connection()
         HeaderIcon:
             id: connection
             canvas:
@@ -63,8 +71,7 @@
                     size: self.size
                     pos: self.pos
                     id: battery_level
-                    source: "D:\Projects\Halo Controller\GUI Icons\Battery Level Indicator.png"
-
+                    source: "D:\Projects\HaloController\GUI\Icons\Battery Level Indicator.png"
 
 <Footer>:
     id: gen_footer
@@ -78,12 +85,6 @@
         Rectangle:
             size: self.size
             pos: self.pos
-    Button:
-        text: "Previous"
-        on_press: root.previous_screen()
-    Button:
-        text: "Next"
-        on_press:
 
 <FlightStats>:
     canvas.before:
@@ -93,6 +94,7 @@
             size: self.size
             pos: self.pos
     name: 'Flight_Stats'
+    Background:
     Header:
         id: fs_header
         top: root.height
@@ -100,21 +102,26 @@
     Footer:
         id: fs_footer
         opacity: 1
+    GestureBox:
+        disabled: False
 
 <ToolBar>:
 
-<Map>:
+<MapScr>:
+    name: 'Map'
     canvas.before:
         Color:
             rgba: root.background_color
         Rectangle:
             size: self.size
             pos: self.pos
-    name: 'Map'
-    MapView:
-        lat: 50.6394
-        lon: 3.057
-        zoom: 13
+    Background:
+    Map:
+        id: map
+        lat: root.con_lat
+        lon: root.con_lon
+        zoom: root.zoom
+        disabled: False
     Header:
         id: fs_header
         top: root.height
@@ -133,6 +140,7 @@
             size: self.size
             pos: self.pos
     name: 'Video'
+    Background:
     Header:
         id: fs_header
         top: root.height
@@ -140,6 +148,8 @@
     Footer:
         id: fs_footer
         opacity: 1
+    GestureBox:
+        disabled: False
 
 
 <Diagnostics>:
@@ -150,7 +160,10 @@
             size: self.size
             pos: self.pos
     name: 'Diagnostics'
+    Background:
     Footer:
+    GestureBox:
+        disabled: False
 
 <SettingsButton>
     size_hint_y: None
@@ -179,9 +192,12 @@
             size: self.size
             pos: self.pos
     name: 'Settings'
+    Background:
     ScrollView:
         GridLayout:
             size_hint_y: None
             height: self.minimum_height
             cols: 2
     Footer:
+    GestureBox:
+        disabled: False
