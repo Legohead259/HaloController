@@ -52,7 +52,7 @@ def next_screen():
     if cur_screen < len(screens) - 1:
         cur_screen += 1
         sm.switch_to(screens[cur_screen], direction="left")
-        print "Switching to: " + sm.current  # Debug
+        # print "Switching to: " + sm.current  # Debug
 
 
 def previous_screen():
@@ -63,7 +63,7 @@ def previous_screen():
     if cur_screen > 0:
         cur_screen -= 1
         sm.switch_to(screens[cur_screen], direction="right")
-        print "Switching to: " + sm.current  # Debug
+        # print "Switching to: " + sm.current  # Debug
 
 
 def update_settings():
@@ -422,10 +422,16 @@ class MapScr(Screen):
             self.ids.FlightStats.footer.opacity = 0
 
     def update_zoom(self):
+        """
+        Updates the zoom of the map corresponding to the encoder input
+        """
         # TODO: Implement changing zoom level
         return 16
 
     def update(self):
+        """
+        Simplifies updating updating coordinate information for controller and drone
+        """
         self.con_lat = self.get_cur_con_lat()
         # print self.con_lat  # Debug
         self.con_lon = self.get_cur_con_lon()
@@ -437,6 +443,9 @@ class MapScr(Screen):
 
 
 class Map(MapView):
+    """
+    The map that is rendered on the map screen
+    """
     def on_touch_down(self, touch):
         if coord_enabled:
             print self.get_latlon_at(touch.x, touch.y, self.zoom)
@@ -454,10 +463,17 @@ class ToolBar(Footer):
 
 
 class ManeuverIcon(Icon):
+    """
+    Class for the different maneuvers that can be dragged onto the map for execution
+    """
     pass
 
 
 class Video(Screen):
+    """
+    Screen that will display a live feed from the Mobius camera on the drone.
+    The user will be able to rotate the 360 degree image by swiping or choosing a 360-degree static render.
+    """
     text_color = colors.black
     background_color = colors.white
     header_enabled = settings["pages"]["video"]["header"]
@@ -466,6 +482,9 @@ class Video(Screen):
     # print(footer_enabled)  # Debug
 
     def update_hf(self):
+        """
+        Turns on/off the header/footer based on user preference.
+        """
         if self.header_enabled:
             self.ids.FlightStats.header.opacity = 1
         else:
@@ -478,25 +497,44 @@ class Video(Screen):
 
 
 class Diagnostics(Screen):
+    """
+    Screen that will display live diagnostics of the drone including battery life expectancy, cpu status, 
+        motor efficiency and others
+    """
     text_color = colors.black
     background_color = colors.white
+    # TODO: Implement
 
 
 class SettingsButton(Button):
+    """
+    Button that will toggle specified setting
+    """
     text_color = colors.black
     background_color = colors.thanics_blue
 
 
 class SettingsLabel(Label):
+    """
+    Label for settings
+    """
     text_color = colors.white
     background_color = colors.thanics_blue
 
 
 class SettingsSwitch(Switch):
+    """
+    Switch that will enable/disable specified setting
+    """
     pass
 
 
 class Settings(Screen):
+    """
+    Screen where user can choose preferences to personalize the controller experience to their liking.
+    Every aspect of the drone and controller is configurable on this screen.
+    Default profiles will be loaded for each flight mode and can be individually configured by the user.
+    """
     text_color = colors.black
     background_color = colors.white
     true_color = colors.green
@@ -505,8 +543,12 @@ class Settings(Screen):
 
     @staticmethod
     def settings_popup():
+        """
+        Creates a popup window in the settings screen that asked user to confirm the changed settings.
+        Is only activated if changes have been made
+        """
         confirm_button = Button(text="Confirm Changes")
-        popup = Popup(content=confirm_button, title="")
+        popup = Popup(content=confirm_button, title="Confirm Changes")
         confirm_button.bind(on_press=popup.dismiss)
         confirm_button.bind(on_press=update_settings())
         popup.open()
