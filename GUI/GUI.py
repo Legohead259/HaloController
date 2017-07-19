@@ -1,6 +1,6 @@
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.label import Label
 from kivy.core.window import Window
@@ -17,9 +17,9 @@ from kivy.uix.switch import Switch
 from libs.garden.mapview import *
 from util import *
 # from kivy.clock import Clock
-from pathlib import Path
-from path import Path
 import os
+from kivy.uix.image import Image
+from kivy.uix.behaviors import ButtonBehavior
 
 
 # -----BEGIN INITIALIZATION-----
@@ -119,10 +119,10 @@ class Background(Screen):
         elif keycode[1] == "right":
             next_screen()
             # print 'right'  # Debug
-        elif keycode[1] == "c":
-            global coord_enabled
-            coord_enabled = not coord_enabled
-            # print coord_enabled  # Debug
+        # elif keycode[1] == "c":
+        #     global coord_enabled
+        #     coord_enabled = not coord_enabled
+        #     # print coord_enabled  # Debug
         elif keycode[1] == "z":
             global zoom
             zoom += 1
@@ -273,7 +273,7 @@ class Header(GridLayout):
         :return: The connection between the controller and the drone
         """
         # TODO: Implement drone connection code
-        return os.path.abspath("icons/ConnectionIconLow.png")
+        return os.path.abspath("icons/ConnectionIconFull.png")
 
     @staticmethod
     def update_battery_bar():
@@ -315,7 +315,7 @@ class HeaderIcon(Icon):
     pass
 
 
-class Footer(BoxLayout):
+class Footer(FloatLayout):
     """
     Footer of the GUI.
     The speed (x, y, and z), acceleration, coordinates, and other misc. flight stats will be displayed here
@@ -380,15 +380,43 @@ class MapScr(Screen):
     # print(header_enabled)  # Debug
     footer_enabled = settings["pages"]["map"]["footer"]
     # print(footer_enabled)  # Debug
+
+    def update_hf(self):
+        """
+        Enables or disables the header and footer based on user preference
+        """
+        if self.header_enabled:
+            self.ids.FlightStats.header.opacity = 1
+        else:
+            Screen.ids.FlightStats.header.opacity = 0
+
+        if self.header_disabled:
+            self.ids.FlightStats.footer.opacity = 1
+        else:
+            self.ids.FlightStats.footer.opacity = 0
+
+
+class Map(MapView):
+    """
+    The map that is rendered on the map screen
+    """
+    marker_lat = None
+    marker_lon = None
     con_lat = settings["pages"]["map"]["defaults"]["lat"]
     con_lon = settings["pages"]["map"]["defaults"]["lon"]
     drone_lat = settings["pages"]["map"]["defaults"]["lat"]
     drone_lon = settings["pages"]["map"]["defaults"]["lon"]
-    zoom = zoom
+    drone_icon = os.path.abspath("icons/DroneIcon.png")
+    con_icon = os.path.abspath("icons/ControllerIcon.png")
 
-    def __init__(self, **kwargs):
-        super(Screen, self).__init__()
-        self.update()
+    def on_touch_down(self, touch):
+        if 50 < touch.y < 270:  # Checks to see if the touch is between the header and footer
+            if coord_enabled:
+                self.marker_lat, self.marker_lon = self.get_latlon_at(touch.x, touch.y, zoom)
+                print self.marker_lat, self.marker_lon  # Debug
+
+            else:
+                super(MapView, self).on_touch_down(touch)
 
     def get_cur_con_lat(self):
         """
@@ -418,21 +446,7 @@ class MapScr(Screen):
         # TODO: Implement getting current drone longitude
         return -77
 
-    def update_hf(self):
-        """
-        Enables or disables the header and footer based on user preference
-        """
-        if self.header_enabled:
-            self.ids.FlightStats.header.opacity = 1
-        else:
-            Screen.ids.FlightStats.header.opacity = 0
-
-        if self.header_disabled:
-            self.ids.FlightStats.footer.opacity = 1
-        else:
-            self.ids.FlightStats.footer.opacity = 0
-
-    def update_zoom(self):
+    def get_cur_zoom(self):
         """
         Updates the zoom of the map corresponding to the encoder input
         """
@@ -453,17 +467,6 @@ class MapScr(Screen):
         # print self.drone_lon  # Debug
 
 
-class Map(MapView):
-    """
-    The map that is rendered on the map screen
-    """
-    def on_touch_down(self, touch):
-        if coord_enabled:
-            print self.get_latlon_at(touch.x, touch.y, self.zoom)
-        else:
-            super(MapView, self).on_touch_down(touch)
-
-
 class ToolBar(Footer):
     """
     Tool bar for the map.
@@ -473,10 +476,21 @@ class ToolBar(Footer):
     pass
 
 
-class ManeuverIcon(Icon):
+class ManeuverIcon(Image, ButtonBehavior, Widget):
     """
     Class for the different maneuvers that can be dragged onto the map for execution
     """
+    move_to_icon = os.path.abspath("icons/DroneIcon.png")
+
+    @staticmethod
+    def update_map_mode():
+        global coord_enabled
+        coord_enabled = not coord_enabled
+        print coord_enabled  # Debug
+
+
+
+class ManeuverMarker(MapMarker):
     pass
 
 

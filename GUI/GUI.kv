@@ -1,4 +1,8 @@
+#:import os os
+
 <Background>:
+
+<ManeuverIcon>:
 
 <GestureBox>:
     id: gesture_box
@@ -118,10 +122,21 @@
     Background:
     Map:
         id: map
-        lat: root.get_cur_con_lat()
-        lon: root.get_cur_con_lon()
-        zoom: root.zoom
+        lat: self.get_cur_con_lat()
+        lon: self.get_cur_con_lon()
+        zoom: self.get_cur_zoom()
         disabled: False
+        MapMarker:
+            id: drone_marker
+            source: map.drone_icon
+            lat: map.get_cur_drone_lat()
+            lon: map.get_cur_drone_lon()
+        MapMarker:
+            id: con_marker
+            source: map.con_icon
+            lat: map.get_cur_con_lat()
+            lon: map.get_cur_con_lon()
+
     Header:
         id: fs_header
         top: root.height
@@ -129,6 +144,10 @@
     Footer:
         id: fs_footer
         opacity: 1
+        ManeuverIcon:
+            id: move_to
+            source: os.path.abspath("icons/DroneIcon.png")
+            on_release: self.update_map_mode()
     GestureBox:
         disabled: True
 
