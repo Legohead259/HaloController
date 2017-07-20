@@ -45,7 +45,13 @@ sm = ScreenManager()
 cur_screen = 0
 
 coord_enabled = False
-zoom = settings["pages"]["map"]["defaults"]["zoom"]
+vel_x = 0
+vel_y = 0
+acc_x = 0
+acc_y = 0
+pitch = 0
+roll = 0
+yaw = 0
 
 
 # -----END INITIALIZATION-----
@@ -124,16 +130,6 @@ class Background(Screen):
         #     global coord_enabled
         #     coord_enabled = not coord_enabled
         #     # print coord_enabled  # Debug
-        elif keycode[1] == "z":
-            if zoom < 19:
-                global zoom
-                zoom += 1
-                print zoom  # Debug
-        elif keycode[1] == "x":
-            if zoom > 0:
-                global zoom
-                zoom -= 1
-                print zoom  # Debug
         return True
 
 
@@ -343,12 +339,55 @@ class FlightStats(Screen):
     footer_enabled = settings["pages"]["flight_stats"]["footer"]
     # print(footer_enabled)  # Debug
 
+    def update_velocity(self):
+        """
+        Updates velocity values for the drone
+        :return: The x and y velocity of the drone respectively
+        """
+        global vel_x, vel_y
+        vel_x = 0  # TODO: Implement getting value
+        # print vel_x  # Debug
+        vel_y = 0  # TODO: Implement getting value
+        # print vel_y  # Debug
+
+        return vel_x, vel_y
+
+    def update_acceleration(self):
+        """
+        Updates acceleration values for the drone
+        :return: The x and y acceleration of the drone respectively
+        """
+        global acc_x, acc_y
+        acc_x = 0  # TODO: Implement getting value
+        # print acc_x  # Debug
+        acc_y = 0  # TODO: Implement getting value
+        # print acc_y  # Debug
+
+        return acc_x, acc_y
+
+    def update_axes(self):
+        """
+        Updates axes values for the drone
+        :return: The pitch, roll, and yaw of the drone respectively
+        """
+        global pitch, roll, yaw
+        pitch = 0  # TODO: Implement getting value
+        # print pitch  # Debug
+        roll = 0  # TODO: Implement getting value
+        # print roll  # Debug
+        yaw = 0  # TODO: Implement getting value
+        # print yaw  # Debug
+
+        return pitch, roll, yaw
+
     def update(self):
         """
-        Updates the axes of motion and the 3D render
+        Lumps all of the flight stats updates into one.
+        For specific documentation, refer to the respective method
         """
-        # TODO: Implement
-        pass
+        self.update_velocity()
+        self.update_acceleration()
+        self.update_axes()
 
     def update_hf(self):
         """
@@ -418,8 +457,10 @@ class Map(MapView):
     marker_lon = None
     marker_height = 25
     con_gps_enabled = True
-    # lat = 35
-    # lon = -77
+
+    def __init__(self, **kwargs):
+        super(Map, self).__init__(**kwargs)
+        self.update()
 
     def on_touch_down(self, touch):
         if 50 < touch.y < 270:  # Checks to see if the touch is between the header and footer
@@ -475,13 +516,14 @@ class Map(MapView):
         """
         Simplifies updating updating coordinate information for controller and drone
         """
+        print "Updating Map..."  # Debug
         # cx, cy = self.get_window_xy_from(self.con_lat, self.con_lon, self.zoom)
         # dx, dy = self.get_window_xy_from(self.drone_lat, self.drone_lon, self.zoom)
 
         # with self.canvas:
-            # l = Line(points=[cx, cy, dx, dy])
-            # self.canvas.add(l)
-            # self.canvas.remove(l)
+        # l = Line(points=[cx, cy, dx, dy])
+        # self.canvas.add(l)
+        # self.canvas.remove(l)
 
         self.con_lat = self.get_cur_con_lat()
         # print self.con_lat  # Debug
@@ -515,7 +557,6 @@ class ManeuverIcon(Image, ButtonBehavior, Widget):
         global coord_enabled
         coord_enabled = not coord_enabled
         print coord_enabled  # Debug
-
 
 
 class ManeuverMarker(MapMarker):
@@ -617,12 +658,21 @@ screens = [fs, m, v, d, s]
 
 class GUIApp(App):
     sm.switch_to(screens[0])
+    icon = os.path.abspath("icons/DroneIcon.png")
+    title = "Controller GUI"
 
     def build(self):
-        Clock.schedule_interval(partial(m.ids.map.update, None), 0.5)
-        m.ids.map.update()
-
+        Clock.schedule_interval(self.update, 0.5)
         return sm
+
+    def update(self, *args):
+        """
+        Updates all of the data streams
+        """
+        if sm.current == m.name:
+            m.ids.map.update()
+        elif sm.current == fs.name:
+            fs.update()
 
 if __name__ == '__main__':
     GUIApp().run()
