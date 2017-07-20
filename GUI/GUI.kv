@@ -1,5 +1,9 @@
 #:import os os
 
+<MapMarker>:
+    size_hint_y: 0
+    height: 15
+
 <Background>:
 
 <ManeuverIcon>:
@@ -113,30 +117,29 @@
 
 <MapScr>:
     name: 'Map'
-    canvas.before:
-        Color:
-            rgba: root.background_color
-        Rectangle:
-            size: self.size
-            pos: self.pos
+    id: map_scr
     Background:
     Map:
         id: map
-        lat: self.get_cur_con_lat()
-        lon: self.get_cur_con_lon()
-        zoom: self.get_cur_zoom()
+        lat: 35
+        lon: -77
+        zoom: 10
         disabled: False
         MapMarker:
             id: drone_marker
             source: map.drone_icon
-            lat: map.get_cur_drone_lat()
-            lon: map.get_cur_drone_lon()
+            lat: map.drone_lat
+            lon: map.drone_lon
+            size_hint_y: 0
+            height: map.marker_height
         MapMarker:
             id: con_marker
             source: map.con_icon
-            lat: map.get_cur_con_lat()
-            lon: map.get_cur_con_lon()
-
+            lat: map.con_lat
+            lon: map.con_lon
+            size_hint_y: 0
+            height: map.marker_height
+            disabled: map.get_con_gps()
     Header:
         id: fs_header
         top: root.height

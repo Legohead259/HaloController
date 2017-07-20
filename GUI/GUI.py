@@ -16,10 +16,11 @@ from kivy.uix.button import Button
 from kivy.uix.switch import Switch
 from libs.garden.mapview import *
 from util import *
-# from kivy.clock import Clock
+from kivy.clock import Clock
 import os
 from kivy.uix.image import Image
 from kivy.uix.behaviors import ButtonBehavior
+from functools import partial
 
 
 # -----BEGIN INITIALIZATION-----
@@ -124,11 +125,15 @@ class Background(Screen):
         #     coord_enabled = not coord_enabled
         #     # print coord_enabled  # Debug
         elif keycode[1] == "z":
-            global zoom
-            zoom += 1
+            if zoom < 19:
+                global zoom
+                zoom += 1
+                print zoom  # Debug
         elif keycode[1] == "x":
-            global zoom
-            zoom -= 1
+            if zoom > 0:
+                global zoom
+                zoom -= 1
+                print zoom  # Debug
         return True
 
 
@@ -395,68 +400,89 @@ class MapScr(Screen):
         else:
             self.ids.FlightStats.footer.opacity = 0
 
+    def update(self):
+        pass
+
 
 class Map(MapView):
     """
     The map that is rendered on the map screen
     """
-    marker_lat = None
-    marker_lon = None
     con_lat = settings["pages"]["map"]["defaults"]["lat"]
     con_lon = settings["pages"]["map"]["defaults"]["lon"]
     drone_lat = settings["pages"]["map"]["defaults"]["lat"]
     drone_lon = settings["pages"]["map"]["defaults"]["lon"]
     drone_icon = os.path.abspath("icons/DroneIcon.png")
     con_icon = os.path.abspath("icons/ControllerIcon.png")
+    marker_lat = None
+    marker_lon = None
+    marker_height = 25
+    con_gps_enabled = True
+    # lat = 35
+    # lon = -77
 
     def on_touch_down(self, touch):
         if 50 < touch.y < 270:  # Checks to see if the touch is between the header and footer
             if coord_enabled:
-                self.marker_lat, self.marker_lon = self.get_latlon_at(touch.x, touch.y, zoom)
+                self.marker_lat, self.marker_lon = self.get_latlon_at(touch.x, touch.y, self.zoom)
                 print self.marker_lat, self.marker_lon  # Debug
 
             else:
                 super(MapView, self).on_touch_down(touch)
+
+    def get_con_gps(self):
+        """
+        Returns if the controller has GPS available
+        :return: Controller GPS enabled
+        """
+        # TODO: Implement controller GPS check
+        self.con_gps_enabled = False
+        return self.con_gps_enabled
 
     def get_cur_con_lat(self):
         """
         Gets the current latitude of the controller
         """
         # TODO: Implement getting current controller latitude
-        return 39
+        self.con_lat = 39
+        return self.con_lat
 
     def get_cur_con_lon(self):
         """
         Gets the current longitude of the controller
         """
         # TODO: Implement getting current controller longitude
-        return -77
+        self.con_lon = -77
+        return self.con_lon
 
     def get_cur_drone_lat(self):
         """
         Gets the current latitude of the drone
         """
         # TODO: Implement getting current drone latitude
-        return 39
+        self.drone_lat = 39.0005
+        return self.drone_lat
 
     def get_cur_drone_lon(self):
         """
         Gets the current longitude of the drone
         """
         # TODO: Implement getting current drone longitude
-        return -77
+        self.drone_lon = -77.0001
+        return self.drone_lon
 
-    def get_cur_zoom(self):
-        """
-        Updates the zoom of the map corresponding to the encoder input
-        """
-        # TODO: Implement changing zoom level
-        return 16
-
-    def update(self):
+    def update(self, *args):
         """
         Simplifies updating updating coordinate information for controller and drone
         """
+        # cx, cy = self.get_window_xy_from(self.con_lat, self.con_lon, self.zoom)
+        # dx, dy = self.get_window_xy_from(self.drone_lat, self.drone_lon, self.zoom)
+
+        # with self.canvas:
+            # l = Line(points=[cx, cy, dx, dy])
+            # self.canvas.add(l)
+            # self.canvas.remove(l)
+
         self.con_lat = self.get_cur_con_lat()
         # print self.con_lat  # Debug
         self.con_lon = self.get_cur_con_lon()
@@ -465,6 +491,8 @@ class Map(MapView):
         # print self.drone_lat  # Debug
         self.drone_lon = self.get_cur_drone_lon()
         # print self.drone_lon  # Debug
+        self.con_gps_enabled = self.get_con_gps()
+        # print self.con_gps_enabled  # Debug
 
 
 class ToolBar(Footer):
@@ -591,6 +619,9 @@ class GUIApp(App):
     sm.switch_to(screens[0])
 
     def build(self):
+        Clock.schedule_interval(partial(m.ids.map.update, None), 0.5)
+        m.ids.map.update()
+
         return sm
 
 if __name__ == '__main__':
