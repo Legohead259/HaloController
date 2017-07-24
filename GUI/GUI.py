@@ -44,7 +44,8 @@ cur_screen = 0
 coord_enabled = False
 flight_stats = {"vx": 0, "vy": 0, "vz": 0, "ax": 0, "ay": 0, "az": 0, "pitch": 0, "roll": 0, "yaw": 0, "alt": 0,
                 "dist": 0, "vu": settings["general"]["units"]["velocity"],
-                "au": settings["general"]["units"]["acceleration"], "mu": settings["general"]["units"]["measurement"]}
+                "au": settings["general"]["units"]["acceleration"], "mu": settings["general"]["units"]["measurement"],
+                "du": u'\N{Degree Sign}'}
 
 
 # -----END INITIALIZATION-----
@@ -119,13 +120,33 @@ class Background(Screen):
         elif keycode[1] == "right":
             next_screen()
             # print 'right'  # Debug
-        # elif keycode[1] == "c":
-        #     global coord_enabled
-        #     coord_enabled = not coord_enabled
-        #     # print coord_enabled  # Debug
-        elif keycode[1] == "=":
-            global flight_stats
+        elif keycode[1] == "c":
+            global coord_enabled
+            coord_enabled = not coord_enabled
+            # print coord_enabled  # Debug
+        elif keycode[1] == "x":
             flight_stats["vx"] += 1
+            # print flight_stats["vx"]
+        elif keycode[1] == "y":
+            flight_stats["vy"] += 1
+            # print flight_stats["vx"]
+        elif keycode[1] == "z":
+            flight_stats["vz"] += 1
+            # print flight_stats["vx"]
+        elif keycode[1] == "p":
+            flight_stats["pitch"] += 1
+            # print flight_stats["vx"]
+        elif keycode[1] == "r":
+            flight_stats["roll"] += 1
+            # print flight_stats["vx"]
+        elif keycode[1] == "w":
+            flight_stats["yaw"] += 1
+            # print flight_stats["vx"]
+        elif keycode[1] == "d":
+            flight_stats["dist"] += 1
+            # print flight_stats["vx"]
+        elif keycode[1] == "a":
+            flight_stats["alt"] += 1
             # print flight_stats["vx"]
 
         return True
@@ -325,52 +346,6 @@ class Footer(GridLayout):
     background_color = colors.thanics_blue
     disabled = False
 
-    vel_x = NumericProperty(flight_stats["vx"])
-    vel_y = NumericProperty(flight_stats["vy"])
-    vel_z = NumericProperty(flight_stats["vz"])
-    acc_x = NumericProperty(flight_stats["ax"])
-    acc_y = NumericProperty(flight_stats["ay"])
-    acc_z = NumericProperty(flight_stats["az"])
-    altitude = NumericProperty(flight_stats["alt"])
-    dist_from_home = NumericProperty(flight_stats["dist"])
-    vel_unit = StringProperty(flight_stats["vu"])
-    acc_unit = StringProperty(flight_stats["au"])
-    meas_unit = StringProperty(flight_stats["mu"])
-
-    def __init__(self, **kwargs):
-        super(GridLayout, self).__init__()
-
-        labels = {"vx": FSLabel(text="[b]vel_x: [/b]" + str(self.vel_x) + self.vel_unit, id='vx_label')}
-
-        for l in labels:
-            self.add_widget(labels.get(l))
-            print labels.get(l)
-            print self.children
-            print self.ids
-
-    def update(self, *args):
-        # print "Updating Footer..."  # Debug
-        # print flight_stats  # Debug
-        # self.vel_x = flight_stats["vx"]
-        # # self.ids.vel_x_label.text = "[b]vel_x: [/b]" + str(self.vel_x) + self.vel_unit
-        # print self.vel_x  # Debug
-        # print flight_stats["vx"]
-        # # print self.ids.vel_x_label.text
-        # print self.ids
-        # app = App.get_running_app()
-        # print app
-        # self.vel_y = flight_stats["vy"]
-        # self.vel_z = flight_stats["vz"]
-        # self.acc_x = flight_stats["ax"]
-        # self.acc_y = flight_stats["ay"]
-        # self.acc_z = flight_stats["az"]
-        # self.altitude = flight_stats["alt"]
-        # self.dist_from_home = flight_stats["dist"]
-        # self.vel_unit = flight_stats["vu"]
-        # self.acc_unit = flight_stats["au"]
-        # self.meas_unit = flight_stats["mu"]
-        pass
-
 
 class FlightStats(Screen):
     """
@@ -389,60 +364,57 @@ class FlightStats(Screen):
         self.update()
         self.update_hf()
 
-    def get_velocity(self):
+    @staticmethod
+    def get_velocity():
         """
         Updates velocity values for the drone
-        :return: The x and y velocity of the drone respectively
         """
-        global vel_x, vel_y, vel_z
-        vel_x = 0  # TODO: Implement getting value
-        # print vel_x  # Debug
-        vel_y = 0  # TODO: Implement getting value
+        flight_stats["vx"] = flight_stats["vx"]  # TODO: Implement getting value
+        # print flight_stats["vx"]  # Debug
+        flight_stats["vy"] = flight_stats["vy"]  # TODO: Implement getting value
         # print vel_y  # Debug
-        vel_z = 0  # TODO: Implement getting value
+        flight_stats["vz"] = flight_stats["vz"]  # TODO: Implement getting value
         # print vel_z  # Debug
 
-        return vel_x, vel_y, vel_z
-
-    def get_acceleration(self):
+    @staticmethod
+    def get_acceleration():
         """
         Updates acceleration values for the drone
-        :return: The x and y acceleration of the drone respectively
         """
-        global acc_x, acc_y, acc_z
-        acc_x = 0  # TODO: Implement getting value
+        flight_stats["ax"] = flight_stats["ax"]  # TODO: Implement getting value
         # print acc_x  # Debug
-        acc_y = 0  # TODO: Implement getting value
+        flight_stats["ay"] = flight_stats["ay"]  # TODO: Implement getting value
         # print acc_y  # Debug
-        acc_z = 0  # TODO: Implement getting value
+        flight_stats["az"] = flight_stats["az"]  # TODO: Implement getting value
         # print acc_z  # Debug
 
-        return acc_x, acc_y, acc_z
-
-    def get_axes(self):
+    @staticmethod
+    def get_axes():
         """
         Updates axes values for the drone
-        :return: The pitch, roll, and yaw of the drone respectively
         """
-        global pitch, roll, yaw
-        pitch = 0  # TODO: Implement getting value
+        flight_stats["pitch"] = flight_stats["pitch"]  # TODO: Implement getting value
         # print pitch  # Debug
-        roll = 0  # TODO: Implement getting value
+        flight_stats["roll"] = flight_stats["roll"]  # TODO: Implement getting value
         # print roll  # Debug
-        yaw = 0  # TODO: Implement getting value
+        flight_stats["yaw"] = flight_stats["yaw"]  # TODO: Implement getting value
         # print yaw  # Debug
 
-        return pitch, roll, yaw
+    @staticmethod
+    def get_dist_from_home():
+        """
+        Updates the distance the drone is away from home (where it first activated)
+        The drone will send the distance
+        """
+        flight_stats["dist"] = flight_stats["dist"]  # TODO: Implement getting value
+        # print flight_stats["dist"]  # Debug
 
-    def get_dist_from_home(self):
+    @staticmethod
+    def get_altitude():
         """
-        Updates the distance the drone is away from home (where it first activated
-        The drone will send 
-        :return: The distance from home in
+        Updates the altitude of the drone
         """
-        global dist_from_home
-        dist_from_home = 0  # TODO: Implement getting value
-        return dist_from_home
+        flight_stats["alt"] = flight_stats["alt"]  # TODO: Implement getting value
 
     def update(self):
         """
@@ -454,6 +426,8 @@ class FlightStats(Screen):
         self.get_velocity()
         self.get_acceleration()
         self.get_axes()
+        self.get_dist_from_home()
+        self.get_altitude()
 
     def update_hf(self):
         """
@@ -472,9 +446,30 @@ class FlightStats(Screen):
 
 
 class FSLabel(Label):
-    font_size = 15
-    text_color = colors.white
+    font_size = 10
+    color = colors.white
     markup = True
+    stat = "vx"
+    stat_unit = "vu"
+
+    def __init__(self, **kwargs):
+        super(FSLabel, self).__init__(**kwargs)
+        self.update()
+        Clock.schedule_interval(self.update, 0.125)
+
+    def update(self, *args):
+        line = "[b]" + self.stat + "[/b]: " + str(flight_stats[self.stat]) + flight_stats[self.stat_unit]
+
+        self.text = line
+        # print self.text # Debug
+
+
+class FSFooter(GridLayout):
+    cols = 3
+    rows = 3
+
+    for i in range(0, len(flight_stats)):
+        label = FSLabel()
 
 
 class MapScr(Screen):
@@ -727,42 +722,34 @@ class Settings(Screen):
         confirm_button.bind(on_press=update_settings())
         popup.open()
 
-fs = FlightStats()
-m = MapScr()
-v = Video()
-d = Diagnostics()
-s = Settings()
-f = Footer()
-
-screens = [fs, m, v, d, s]
-
-
-class GUIManager(ScreenManager):
-    pass
-
-sm = GUIManager()
-
 
 class GUIApp(App):
+    fs = FlightStats()
+    m = MapScr()
+    v = Video()
+    d = Diagnostics()
+    s = Settings()
+    screens = [fs, m, v, d, s]
+    sm = ScreenManager()
     sm.switch_to(screens[0])
+
     icon = os.path.abspath("icons/DroneIcon.png")
     title = "Controller GUI"
 
     def build(self):
         Clock.schedule_interval(self.update, 0.25)
         # Clock.schedule_interval(f.update, 1)
-        return sm
+
+        return self.sm
 
     def update(self, *args):
         """
         Updates all of the data streams
         """
-        f.update()
-
-        if sm.current == m.name:
-            m.ids.map.update()
-        elif sm.current == fs.name:
-            fs.update()
+        if self.sm.current == self.m.name:
+            self.m.ids.map.update()
+        elif self.sm.current == self.fs.name:
+            self.fs.update()
 
 if __name__ == '__main__':
     GUIApp().run()

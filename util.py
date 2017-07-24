@@ -1,11 +1,14 @@
 import json
+import os
 
-loc = "C:\Users\Duffy\PycharmProjects\HaloController\Settings.json"
+os.chdir("..")
+loc = os.path.abspath("Settings.json")
 with open(loc) as settings_file:
     settings = json.load(settings_file)
+os.chdir("GUI")
 
 
-class Colors():
+class Colors:
     thanics_blue = None
     white = None
     black = None

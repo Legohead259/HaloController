@@ -93,6 +93,44 @@
         Rectangle:
             size: self.size
             pos: self.pos
+    GridLayout:
+        cols: 3
+        rows: 3
+        FSLabel:
+            id: vx
+            stat: "vx"
+            stat_unit: "vu"
+        FSLabel:
+            id: vy
+            stat: "vy"
+            stat_unit: "vu"
+        FSLabel:
+            id: vz
+            stat: "vz"
+            stat_unit: "vu"
+        FSLabel:
+            id: pitch
+            stat: "pitch"
+            stat_unit: "du"
+        FSLabel:
+            id: roll
+            stat: "roll"
+            stat_unit: "du"
+        FSLabel:
+            id: yaw
+            stat: "yaw"
+            stat_unit: "du"
+        FSLabel:
+            id: dist_from_home
+            stat: "dist"
+            stat_unit: "mu"
+        FSLabel:
+            id: altitude
+            stat: "alt"
+            stat_unit: "mu"
+    Widget:
+    Widget:
+
 
 <FlightStats>:
     canvas.before:
