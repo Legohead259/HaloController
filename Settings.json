@@ -112,8 +112,9 @@
             ]
         }, 
         "units": {
-            "measurements": "metric", 
-            "speed": "per second"
+            "velocity": "m/s",
+            "acceleration": "m/s^2",
+            "measurement": "m"
         }, 
         "touch_min_score": 0.7
     }

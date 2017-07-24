@@ -1,6 +1,5 @@
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.label import Label
 from kivy.core.window import Window
@@ -10,7 +9,6 @@ from kivy.gesture import Gesture
 from gestures import *
 from kivy.graphics import Line
 from kivy.uix.widget import Widget
-# from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.uix.switch import Switch
@@ -20,7 +18,7 @@ from kivy.clock import Clock
 import os
 from kivy.uix.image import Image
 from kivy.uix.behaviors import ButtonBehavior
-from functools import partial
+from kivy.properties import NumericProperty, StringProperty
 
 
 # -----BEGIN INITIALIZATION-----
@@ -41,17 +39,12 @@ Window.size = (480, 320)
 Window.clearcolor = colors.white
 Builder.load_file("GUI.kv")
 
-sm = ScreenManager()
 cur_screen = 0
 
 coord_enabled = False
-vel_x = 0
-vel_y = 0
-acc_x = 0
-acc_y = 0
-pitch = 0
-roll = 0
-yaw = 0
+flight_stats = {"vx": 0, "vy": 0, "vz": 0, "ax": 0, "ay": 0, "az": 0, "pitch": 0, "roll": 0, "yaw": 0, "alt": 0,
+                "dist": 0, "vu": settings["general"]["units"]["velocity"],
+                "au": settings["general"]["units"]["acceleration"], "mu": settings["general"]["units"]["measurement"]}
 
 
 # -----END INITIALIZATION-----
@@ -130,6 +123,11 @@ class Background(Screen):
         #     global coord_enabled
         #     coord_enabled = not coord_enabled
         #     # print coord_enabled  # Debug
+        elif keycode[1] == "=":
+            global flight_stats
+            flight_stats["vx"] += 1
+            # print flight_stats["vx"]
+
         return True
 
 
@@ -316,15 +314,62 @@ class HeaderIcon(Icon):
     pass
 
 
-class Footer(FloatLayout):
+class Footer(GridLayout):
     """
     Footer of the GUI.
-    The speed (x, y, and z), acceleration, coordinates, and other misc. flight stats will be displayed here
+    The speed (x/y/z), acceleration, distance from home, and altitude will be displayed here
     """
-    # TODO: Implement getting and displaying speed, acceleration, coordinates, and other misc flight stats
+    # TODO: Implement getting and displaying stats
     text_color = colors.black
+    text_size = 10
     background_color = colors.thanics_blue
     disabled = False
+
+    vel_x = NumericProperty(flight_stats["vx"])
+    vel_y = NumericProperty(flight_stats["vy"])
+    vel_z = NumericProperty(flight_stats["vz"])
+    acc_x = NumericProperty(flight_stats["ax"])
+    acc_y = NumericProperty(flight_stats["ay"])
+    acc_z = NumericProperty(flight_stats["az"])
+    altitude = NumericProperty(flight_stats["alt"])
+    dist_from_home = NumericProperty(flight_stats["dist"])
+    vel_unit = StringProperty(flight_stats["vu"])
+    acc_unit = StringProperty(flight_stats["au"])
+    meas_unit = StringProperty(flight_stats["mu"])
+
+    def __init__(self, **kwargs):
+        super(GridLayout, self).__init__()
+
+        labels = {"vx": FSLabel(text="[b]vel_x: [/b]" + str(self.vel_x) + self.vel_unit, id='vx_label')}
+
+        for l in labels:
+            self.add_widget(labels.get(l))
+            print labels.get(l)
+            print self.children
+            print self.ids
+
+    def update(self, *args):
+        # print "Updating Footer..."  # Debug
+        # print flight_stats  # Debug
+        # self.vel_x = flight_stats["vx"]
+        # # self.ids.vel_x_label.text = "[b]vel_x: [/b]" + str(self.vel_x) + self.vel_unit
+        # print self.vel_x  # Debug
+        # print flight_stats["vx"]
+        # # print self.ids.vel_x_label.text
+        # print self.ids
+        # app = App.get_running_app()
+        # print app
+        # self.vel_y = flight_stats["vy"]
+        # self.vel_z = flight_stats["vz"]
+        # self.acc_x = flight_stats["ax"]
+        # self.acc_y = flight_stats["ay"]
+        # self.acc_z = flight_stats["az"]
+        # self.altitude = flight_stats["alt"]
+        # self.dist_from_home = flight_stats["dist"]
+        # self.vel_unit = flight_stats["vu"]
+        # self.acc_unit = flight_stats["au"]
+        # self.meas_unit = flight_stats["mu"]
+        pass
 
 
 class FlightStats(Screen):
@@ -339,33 +384,42 @@ class FlightStats(Screen):
     footer_enabled = settings["pages"]["flight_stats"]["footer"]
     # print(footer_enabled)  # Debug
 
-    def update_velocity(self):
+    def __int__(self, **kwargs):
+        super(Screen, self).__init__()
+        self.update()
+        self.update_hf()
+
+    def get_velocity(self):
         """
         Updates velocity values for the drone
         :return: The x and y velocity of the drone respectively
         """
-        global vel_x, vel_y
+        global vel_x, vel_y, vel_z
         vel_x = 0  # TODO: Implement getting value
         # print vel_x  # Debug
         vel_y = 0  # TODO: Implement getting value
         # print vel_y  # Debug
+        vel_z = 0  # TODO: Implement getting value
+        # print vel_z  # Debug
 
-        return vel_x, vel_y
+        return vel_x, vel_y, vel_z
 
-    def update_acceleration(self):
+    def get_acceleration(self):
         """
         Updates acceleration values for the drone
         :return: The x and y acceleration of the drone respectively
         """
-        global acc_x, acc_y
+        global acc_x, acc_y, acc_z
         acc_x = 0  # TODO: Implement getting value
         # print acc_x  # Debug
         acc_y = 0  # TODO: Implement getting value
         # print acc_y  # Debug
+        acc_z = 0  # TODO: Implement getting value
+        # print acc_z  # Debug
 
-        return acc_x, acc_y
+        return acc_x, acc_y, acc_z
 
-    def update_axes(self):
+    def get_axes(self):
         """
         Updates axes values for the drone
         :return: The pitch, roll, and yaw of the drone respectively
@@ -380,14 +434,26 @@ class FlightStats(Screen):
 
         return pitch, roll, yaw
 
+    def get_dist_from_home(self):
+        """
+        Updates the distance the drone is away from home (where it first activated
+        The drone will send 
+        :return: The distance from home in
+        """
+        global dist_from_home
+        dist_from_home = 0  # TODO: Implement getting value
+        return dist_from_home
+
     def update(self):
         """
         Lumps all of the flight stats updates into one.
         For specific documentation, refer to the respective method
         """
-        self.update_velocity()
-        self.update_acceleration()
-        self.update_axes()
+        # print "Updating Flight Stats..."  # Debug
+
+        self.get_velocity()
+        self.get_acceleration()
+        self.get_axes()
 
     def update_hf(self):
         """
@@ -403,6 +469,12 @@ class FlightStats(Screen):
             self.ids.FlightStats.footer.opacity = 1
         else:
             self.ids.FlightStats.footer.opacity = 0
+
+
+class FSLabel(Label):
+    font_size = 15
+    text_color = colors.white
+    markup = True
 
 
 class MapScr(Screen):
@@ -485,16 +557,22 @@ class Map(MapView):
         Gets the current latitude of the controller
         """
         # TODO: Implement getting current controller latitude
-        self.con_lat = 39
-        return self.con_lat
+        if self.con_gps_enabled:
+            self.con_lat = 39
+            return self.con_lat
+        else:
+            return
 
     def get_cur_con_lon(self):
         """
         Gets the current longitude of the controller
         """
         # TODO: Implement getting current controller longitude
-        self.con_lon = -77
-        return self.con_lon
+        if self.con_gps_enabled:
+            self.con_lon = -77
+            return self.con_lon
+        else:
+            return
 
     def get_cur_drone_lat(self):
         """
@@ -516,7 +594,7 @@ class Map(MapView):
         """
         Simplifies updating updating coordinate information for controller and drone
         """
-        print "Updating Map..."  # Debug
+        # print "Updating Map..."  # Debug
         # cx, cy = self.get_window_xy_from(self.con_lat, self.con_lon, self.zoom)
         # dx, dy = self.get_window_xy_from(self.drone_lat, self.drone_lon, self.zoom)
 
@@ -525,10 +603,12 @@ class Map(MapView):
         # self.canvas.add(l)
         # self.canvas.remove(l)
 
-        self.con_lat = self.get_cur_con_lat()
-        # print self.con_lat  # Debug
-        self.con_lon = self.get_cur_con_lon()
-        # print self.con_lon  # Debug
+        if self.con_gps_enabled:
+            self.con_lat = self.get_cur_con_lat()
+            # print self.con_lat  # Debug
+            self.con_lon = self.get_cur_con_lon()
+            # print self.con_lon  # Debug
+
         self.drone_lat = self.get_cur_drone_lat()
         # print self.drone_lat  # Debug
         self.drone_lon = self.get_cur_drone_lon()
@@ -652,8 +732,15 @@ m = MapScr()
 v = Video()
 d = Diagnostics()
 s = Settings()
+f = Footer()
 
 screens = [fs, m, v, d, s]
+
+
+class GUIManager(ScreenManager):
+    pass
+
+sm = GUIManager()
 
 
 class GUIApp(App):
@@ -662,13 +749,16 @@ class GUIApp(App):
     title = "Controller GUI"
 
     def build(self):
-        Clock.schedule_interval(self.update, 0.5)
+        Clock.schedule_interval(self.update, 0.25)
+        # Clock.schedule_interval(f.update, 1)
         return sm
 
     def update(self, *args):
         """
         Updates all of the data streams
         """
+        f.update()
+
         if sm.current == m.name:
             m.ids.map.update()
         elif sm.current == fs.name:

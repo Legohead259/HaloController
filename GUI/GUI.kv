@@ -86,7 +86,7 @@
     size_hint_y: None
     height: 50
     opacity: 1
-    orientation: "horizontal"
+    cols: 3
     canvas:
         Color:
             rgba: root.background_color
@@ -102,6 +102,7 @@
             size: self.size
             pos: self.pos
     name: 'Flight_Stats'
+    id: flight_stats
     Background:
     Header:
         id: fs_header
@@ -111,7 +112,7 @@
         id: fs_footer
         opacity: 1
     GestureBox:
-        disabled: False
+        disabled: True
 
 <ToolBar>:
 
