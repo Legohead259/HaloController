@@ -722,17 +722,17 @@ class Settings(Screen):
         confirm_button.bind(on_press=update_settings())
         popup.open()
 
+fs = FlightStats()
+m = MapScr()
+v = Video()
+d = Diagnostics()
+s = Settings()
+screens = [fs, m, v, d, s]
+sm = ScreenManager()
+sm.switch_to(screens[0])
+
 
 class GUIApp(App):
-    fs = FlightStats()
-    m = MapScr()
-    v = Video()
-    d = Diagnostics()
-    s = Settings()
-    screens = [fs, m, v, d, s]
-    sm = ScreenManager()
-    sm.switch_to(screens[0])
-
     icon = os.path.abspath("icons/DroneIcon.png")
     title = "Controller GUI"
 
@@ -740,16 +740,16 @@ class GUIApp(App):
         Clock.schedule_interval(self.update, 0.25)
         # Clock.schedule_interval(f.update, 1)
 
-        return self.sm
+        return sm
 
     def update(self, *args):
         """
         Updates all of the data streams
         """
-        if self.sm.current == self.m.name:
-            self.m.ids.map.update()
-        elif self.sm.current == self.fs.name:
-            self.fs.update()
+        if sm.current == m.name:
+            m.ids.map.update()
+        elif sm.current == fs.name:
+            fs.update()
 
 if __name__ == '__main__':
     GUIApp().run()
