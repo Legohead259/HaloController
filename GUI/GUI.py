@@ -18,7 +18,6 @@ from kivy.clock import Clock
 import os
 from kivy.uix.image import Image
 from kivy.uix.behaviors import ButtonBehavior
-from kivy.properties import NumericProperty, StringProperty
 
 
 # -----BEGIN INITIALIZATION-----
@@ -94,9 +93,6 @@ class Background(Screen):
     During development, keyboard inputs will be substituted for the actual controller inputs.
     When properly implemented, this class will check for inputs from all of the inputs and adjust the screen accordingly
     """
-
-    # TODO: Update to handle keyboard (during dev) and controller board (during deployment) inputs
-    # TODO: Update to automatically switch between keyboard and controller board inputs
 
     def __init__(self, **kwargs):
         super(Screen, self).__init__()
@@ -340,7 +336,6 @@ class Footer(GridLayout):
     Footer of the GUI.
     The speed (x/y/z), acceleration, distance from home, and altitude will be displayed here
     """
-    # TODO: Implement getting and displaying stats
     text_color = colors.black
     text_size = 10
     background_color = colors.thanics_blue
@@ -360,7 +355,7 @@ class FlightStats(Screen):
     # print(footer_enabled)  # Debug
 
     def __int__(self, **kwargs):
-        super(Screen, self).__init__()
+        super(FlightStats, self).__init__()
         self.update()
         self.update_hf()
 
@@ -416,6 +411,20 @@ class FlightStats(Screen):
         """
         flight_stats["alt"] = flight_stats["alt"]  # TODO: Implement getting value
 
+    def update_hf(self):
+        """
+        Enables or disables the header and footer based on user preference
+        """
+        if self.header_enabled:
+            self.ids.fs_header.opacity = 1
+        else:
+            self.ids.fs_header.opacity = 0
+
+        if self.footer_enabled:
+            self.ids.fs_footer.opacity = 1
+        else:
+            self.ids.fs_footer.opacity = 0
+
     def update(self):
         """
         Lumps all of the flight stats updates into one.
@@ -423,32 +432,21 @@ class FlightStats(Screen):
         """
         # print "Updating Flight Stats..."  # Debug
 
+        # self.debug_flight_stat("vx")  # Debug
+        # print self.ids
         self.get_velocity()
         self.get_acceleration()
         self.get_axes()
         self.get_dist_from_home()
         self.get_altitude()
 
-    def update_hf(self):
-        """
-        Enables or disables the header and footer based on user preference
-        """
-        # TODO: Better Implement
-        if self.header_enabled:
-            self.ids.FlightStats.header.opacity = 1
-        else:
-            Screen.ids.FlightStats.header.opacity = 0
-
-        if self.header_disabled:
-            self.ids.FlightStats.footer.opacity = 1
-        else:
-            self.ids.FlightStats.footer.opacity = 0
-
 
 class FSLabel(Label):
     font_size = 10
     color = colors.white
     markup = True
+    font_name = os.path.abspath("misc/century-gothic/gothicb")
+
     stat = "vx"
     stat_unit = "vu"
 
@@ -458,18 +456,10 @@ class FSLabel(Label):
         Clock.schedule_interval(self.update, 0.125)
 
     def update(self, *args):
-        line = "[b]" + self.stat + "[/b]: " + str(flight_stats[self.stat]) + flight_stats[self.stat_unit]
+        line = self.stat + ": " + str(flight_stats[self.stat]) + flight_stats[self.stat_unit]
 
         self.text = line
         # print self.text # Debug
-
-
-class FSFooter(GridLayout):
-    cols = 3
-    rows = 3
-
-    for i in range(0, len(flight_stats)):
-        label = FSLabel()
 
 
 class MapScr(Screen):

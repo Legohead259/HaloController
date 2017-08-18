@@ -36,10 +36,10 @@
                 "second": "pitch", 
                 "third": "roll", 
                 "first": "yaw"
-            }, 
+            },
+            "header": false,
             "footer": true, 
-            "yaw": "relative", 
-            "header": false, 
+            "yaw": "relative",
             "active": true, 
             "tile_size": {
                 "yaw": 0.3, 

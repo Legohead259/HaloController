@@ -116,7 +116,7 @@ class MapMarker(ButtonBehavior, Image):
     be at the X center of the image.
     """
 
-    anchor_y = NumericProperty(0.5)
+    anchor_y = NumericProperty(0)
     """Anchor of the marker on the Y axis. Defaults to 0, mean the anchor will
     be at the Y bottom of the image.
     """
