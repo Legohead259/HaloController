@@ -236,13 +236,6 @@ class GestureBox(Widget):
             pass
 
 
-class Icon(Widget):
-    """
-    Superclass for any icons used in the GUI
-    """
-    pass
-
-
 class Header(GridLayout):
     """
     Top portion of the GUI that contains the connectivity stats and battery level.
@@ -322,13 +315,6 @@ class Header(GridLayout):
         batt_bar = self.update_battery_bar()
         self.battery_conversion_factor = batt_bar[0]
         self.battery_level_color = batt_bar[1]
-
-
-class HeaderIcon(Icon):
-    """
-    Icon for the header of the GUI
-    """
-    pass
 
 
 class Footer(GridLayout):
@@ -611,7 +597,7 @@ class ToolBar(Footer):
     pass
 
 
-class ManeuverIcon(Image, ButtonBehavior, Widget):
+class ManeuverIcon(Image, ButtonBehavior):
     """
     Class for the different maneuvers that can be dragged onto the map for execution
     """
@@ -663,29 +649,6 @@ class Diagnostics(Screen):
     text_color = colors.black
     background_color = colors.white
     # TODO: Implement
-
-
-class SettingsButton(Button):
-    """
-    Button that will toggle specified setting
-    """
-    text_color = colors.black
-    background_color = colors.thanics_blue
-
-
-class SettingsLabel(Label):
-    """
-    Label for settings
-    """
-    text_color = colors.white
-    background_color = colors.thanics_blue
-
-
-class SettingsSwitch(Switch):
-    """
-    Switch that will enable/disable specified setting
-    """
-    pass
 
 
 class Settings(Screen):

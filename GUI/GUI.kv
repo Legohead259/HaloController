@@ -12,7 +12,7 @@
     id: gesture_box
     disabled: False
 
-<HeaderIcon>:
+<HeaderIcon@Image>:
     size_hint_x: None
     width: 55
     size_hint_y: None
@@ -34,40 +34,25 @@
                 pos: self.pos
                 source: root.left_image
         HeaderIcon:
-            id: con_gps
-            canvas:
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-                    id: gps_icon
-                    source: root.get_drone_gps_connection()
-    BoxLayout:
+            id: gps_icon
+            source: root.get_drone_gps_connection()
+    GridLayout:
         id: right
-        padding: [45, 5, 5, 10]
-        spacing: 10
+        padding: [75, 5, 0, 5]
+        cols: 3
         canvas:
             Rectangle:
                 size: self.size
                 pos: self.pos
                 source: root.right_image
         HeaderIcon:
-            id: con_gps
-            canvas:
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-                    id: gps_icon
-                    source: root.get_con_gps_connection()
+            id: gps_icon
+            source: root.get_con_gps_connection()
         HeaderIcon:
-            id: connection
-            canvas:
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-                    id: drone_connection
-                    source: root.get_drone_connection()
+            id: drone_connection
+            source: root.get_drone_connection()
         HeaderIcon:
-            id: battery
+            id: battery_level
             height: 29
             canvas:
                 Color:
@@ -75,11 +60,7 @@
                 Rectangle:
                     size: self.width - (16 + root.battery_conversion_factor), self.height - 9  # Default is -16, -9
                     pos: self.x + (12 + root.battery_conversion_factor), self.y + 5  # Default is +12, +5
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-                    id: battery_level
-                    source: root.battery_image
+            source: root.battery_image
 
 <Footer>:
     id: gen_footer
@@ -128,9 +109,6 @@
             id: altitude
             stat: "alt"
             stat_unit: "mu"
-    Image:
-        source: os.path.abspath("icons/Logo.png")
-
 
 <FlightStats>:
     canvas.before:
