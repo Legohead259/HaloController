@@ -24,38 +24,10 @@ shutdown_adr = 0x00
 reset_adr = 0x4F
 
 # LED Registers
-led_1_r = 0x03
-led_1_g = 0x04
-led_1_b = 0x05
-led_2_r = 0x06
-led_2_g = 0x07
-led_2_b = 0x08
-led_3_r = 0x09
-led_3_g = 0x0A
-led_3_b = 0x0B
-led_4_r = 0x0C
-led_4_g = 0x0D
-led_4_b = 0x0E
-led_5_r = 0x0F
-led_5_g = 0x10
-led_5_b = 0x11
-led_6_r = 0x12
-led_6_g = 0x13
-led_6_b = 0x14
-led_7_r = 0x15
-led_7_g = 0x16
-led_7_b = 0x17
-led_8_r = 0x18
-led_8_g = 0x19
-led_8_b = 0x1A
-led_1 = led_1_r
-led_2 = led_2_r
-led_3 = led_3_r
-led_4 = led_4_r
-led_5 = led_5_r
-led_6 = led_6_r
-led_7 = led_7_r
-led_8 = led_8_r
+leds = {"led_1_r": 0x03, "led_1_g": 0x04, "led_1_b": 0x05, "led_2_r": 0x06, "led_2_g": 0x07, "led_2_b": 0x08,
+        "led_3_r": 0x09, "led_3_g": 0x0A, "led_3_b": 0x0B, "led_4_r": 0x0C, "led_4_g": 0x0D, "led_4_b": 0x0E,
+        "led_5_r": 0x0F, "led_5_g": 0x10, "led_5_b": 0x11, "led_6_r": 0x12, "led_6_g": 0x13, "led_6_b": 0x14,
+        "led_7_r": 0x15, "led_7_g": 0x16, "led_7_b": 0x17, "led_8_r": 0x18, "led_8_g": 0x19, "led_8_b": 0x1A}
 
 # Brightness Spectrum
 spectrum = []
@@ -143,8 +115,8 @@ def breathe_led(led):
     for brightness in spectrum:  # Decrease in brightness from max to off
         write_block_data(led, [brightness])
         time.sleep(0.1)
-    # print(brightness)  #Debug: prints brightness value
-    # print brightness-1, ":", spectrum[brightness - 1]  #Debug: prints the index number of spectrum and the value
+        # print(brightness)  #Debug: prints brightness value
+        # print brightness-1, ":", spectrum[brightness - 1]  #Debug: prints the index number of spectrum and the value
 
 
 def led_rainbow(led, num_led=1):
@@ -173,7 +145,7 @@ def loop():
         # breathe_led_set(led_1_r)
         # make_color(led_1_r, "r")
         # make_color(led_3, "b")
-        led_rainbow(led_1, random.randint(1, 8))
+        led_rainbow(leds["led_1_r"], random.randint(1, 8))
         pass
 
 
