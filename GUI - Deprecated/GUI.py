@@ -6,7 +6,7 @@ from kivy.core.window import Window
 from kivy.uix.gridlayout import GridLayout
 from kivy.gesture import Gesture
 # import json
-from gestures import *
+from GUI.gestures import *
 from kivy.graphics import Line
 from kivy.uix.widget import Widget
 from kivy.uix.popup import Popup
@@ -28,7 +28,7 @@ colors = Colors()
 os.chdir("..")
 settings_loc = os.path.abspath("Settings.json")
 # print settings_loc  # Debug
-os.chdir("GUI")
+os.chdir("GUI - Deprecated")
 # print os.path.abspath("")  # Debug
 
 with open(settings_loc) as settings_file:
@@ -36,7 +36,7 @@ with open(settings_loc) as settings_file:
 
 Window.size = (480, 320)
 Window.clearcolor = colors.white
-Builder.load_file("GUI.kv")
+Builder.load_file("GUI - Deprecated.kv")
 
 cur_screen = 0
 
@@ -84,12 +84,12 @@ def update_settings():
 
 # -----END UTILITY METHODS-----
 
-# -----BEGIN GUI OBJECTS-----
+# -----BEGIN GUI - Deprecated OBJECTS-----
 
 
 class Background(Screen):
     """
-    This class will run in the background of all screens on the GUI.
+    This class will run in the background of all screens on the GUI - Deprecated.
     During development, keyboard inputs will be substituted for the actual controller inputs.
     When properly implemented, this class will check for inputs from all of the inputs and adjust the screen accordingly
     """
@@ -101,7 +101,7 @@ class Background(Screen):
 
     def keyboard_closed(self):
         """
-        Method for closing keyboard connection to GUI
+        Method for closing keyboard connection to GUI - Deprecated
         """
         self.keyboard.unbind(on_key_down=self.on_keyboard_down)
         self.keyboard = None
@@ -238,7 +238,7 @@ class GestureBox(Widget):
 
 class Header(GridLayout):
     """
-    Top portion of the GUI that contains the connectivity stats and battery level.
+    Top portion of the GUI - Deprecated that contains the connectivity stats and battery level.
     The connectivity stats are for GPS and WiFi.
     """
     text_color = colors.black
@@ -319,7 +319,7 @@ class Header(GridLayout):
 
 class Footer(GridLayout):
     """
-    Footer of the GUI.
+    Footer of the GUI - Deprecated.
     The speed (x/y/z), acceleration, distance from home, and altitude will be displayed here
     """
     text_color = colors.black
@@ -509,7 +509,7 @@ class Map(MapView):
         if 50 < touch.y < 270:  # Checks to see if the touch is between the header and footer
             if coord_enabled:
                 self.marker_lat, self.marker_lon = self.get_latlon_at(touch.x, touch.y, self.zoom)
-                print self.marker_lat, self.marker_lon  # Debug
+                print(self.marker_lat, self.marker_lon)  # Debug
 
             else:
                 super(MapView, self).on_touch_down(touch)
@@ -687,7 +687,7 @@ sm.switch_to(screens[0])
 
 class GUIApp(App):
     icon = os.path.abspath("icons/DroneIcon.png")
-    title = "Controller GUI"
+    title = "Controller GUI - Deprecated"
 
     def build(self):
         Clock.schedule_interval(self.update, 0.25)
@@ -708,4 +708,4 @@ if __name__ == '__main__':
     GUIApp().run()
 
 
-# -----END GUI OBJECTS-----
+# -----END GUI - Deprecated OBJECTS-----

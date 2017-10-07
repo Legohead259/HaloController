@@ -5,7 +5,7 @@ os.chdir("..")
 loc = os.path.abspath("Settings.json")
 with open(loc) as settings_file:
     settings = json.load(settings_file)
-os.chdir("GUI")
+os.chdir("GUI - Deprecated")
 
 
 class Colors:
