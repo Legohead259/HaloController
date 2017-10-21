@@ -36,7 +36,7 @@ with open(settings_loc) as settings_file:
 
 Window.size = (480, 320)
 Window.clearcolor = colors.white
-Builder.load_file("GUI.kv")
+Builder.load_file("gui.kv")
 
 cur_screen = 0
 

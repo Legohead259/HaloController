@@ -20,6 +20,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="super.ids" />
+          <option value="serial.Serial" />
         </list>
       </option>
     </inspection_tool>
