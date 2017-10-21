@@ -11,3 +11,4 @@ while True:
     bit_rec = port.read()
     print "Received:", bit_rec
     ack += 1
+    print "This is a test to show that GitHub V1 updating is working"
