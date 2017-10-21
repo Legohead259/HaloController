@@ -38,6 +38,7 @@ for x in range(0, 256, 4):
 
 # Rainbow Spectrums
 rainbow_temp = []
+rainbow = []
 r = 255
 g = 0
 b = 0
@@ -77,9 +78,9 @@ def update_rainbow(color, color_str):
 
 # print rainbow_temp  #Debug
 
-def make_rainbow(r):
+def make_rainbow(rate):
     global rainbow
-    rate = int(255 / r)
+    rate = int(255 / rate)
 
     increase(g, rate, "g")  # Changes color to YELLOW
     decrease(r, rate, "r")  # Changes color to GREEN
@@ -99,21 +100,21 @@ def update_leds():
     bus.write_byte_data(driver_adr, update_adr, 0x00)  # Sends update command to driver
 
 
-def write_block_data(start_led, data):
+def write_leds(start_led, data):
     bus.write_i2c_block_data(driver_adr, start_led, data)
     update_leds()
 
 
 # print data  #Debug: prints the data to be sent
 
-def breathe_led(led):
+def breathe(led, num_led=1):
     for brightness in spectrum:  # Increase in brightness from off to max
-        write_block_data(led, [brightness])
+        write_leds(led, [brightness]*num_led)
         time.sleep(0.1)
     # print(brightness)  #Debug: prints brightness values
     # print brightness, ":", spectrum[brightness]  #Debug: prints the index number of spectrum and the value
-    for brightness in spectrum:  # Decrease in brightness from max to off
-        write_block_data(led, [brightness])
+    for brightness in list(reversed(spectrum)):  # Decrease in brightness from max to off
+        write_leds(led, [brightness]*num_led)
         time.sleep(0.1)
         # print(brightness)  #Debug: prints brightness value
         # print brightness-1, ":", spectrum[brightness - 1]  #Debug: prints the index number of spectrum and the value
@@ -123,9 +124,9 @@ def led_rainbow(led, num_led=1):
     for color in rainbow:
         # print color  #Debug: prints the color
         # make_color(led, color, num_led)
-        write_block_data(led, color * num_led)
+        write_leds(led, color * num_led)
         time.sleep(0.1)
-    write_block_data(led, [off, off, off] * num_led)
+    write_leds(led, [off, off, off] * num_led)  # Clean up LEDs
 
 
 def setup():
@@ -141,11 +142,8 @@ def setup():
 
 def loop():
     while True:
-        # breathe_led(led_1_r)
-        # breathe_led_set(led_1_r)
-        # make_color(led_1_r, "r")
-        # make_color(led_3, "b")
         led_rainbow(leds["led_1_r"], random.randint(1, 8))
+        breathe(leds["led_1_r"])
         pass
 
 
