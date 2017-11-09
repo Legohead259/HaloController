@@ -13,6 +13,7 @@
       <option name="ignoredNames">
         <list>
           <option value="TypeError" />
+          <option value="map" />
         </list>
       </option>
     </inspection_tool>

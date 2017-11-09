@@ -6,7 +6,6 @@ from kivy.core.window import Window
 from kivy.uix.gridlayout import GridLayout
 from kivy.gesture import Gesture
 # import json
-from GUI.gestures import *
 from kivy.graphics import Line
 from kivy.uix.widget import Widget
 from kivy.uix.popup import Popup
@@ -36,7 +35,7 @@ with open(settings_loc) as settings_file:
 
 Window.size = (480, 320)
 Window.clearcolor = colors.white
-Builder.load_file("GUI - Deprecated.kv")
+Builder.load_file("GUI.kv")
 
 cur_screen = 0
 
@@ -146,94 +145,6 @@ class Background(Screen):
             # print flight_stats["vx"]
 
         return True
-
-
-class GestureBox(Widget):
-    """
-    This class creates a box that encompasses the entire window.
-    In this box, gestures can be made by clicking and dragging the cursor in a direction.
-    Behaviors can be defined in the 'on_touch_up' method.
-    To create a new gesture, follow the documentation in the 'gestures.py' file.
-    """
-    @staticmethod
-    def make_gesture(point_list):
-        """
-        Creates a gesture for recognition in the 'on_touch_up' method
-        :param point_list: the list of points created by the gesture
-        :return: the gesture in a string format
-        """
-        g = Gesture()
-        g.add_stroke(point_list)
-        g.normalize()
-        return g
-
-    def __init__(self, *args, **kwargs):
-        super(GestureBox, self).__init__()
-        self.gdb = GestureDatabase()
-        self.gdb.add_gesture(swipe_l_r)
-        self.gdb.add_gesture(swipe_r_l)
-
-    def on_touch_down(self, touch):
-        """
-        Method that starts the gesture recognition when the click is first clicked down
-        :param touch: the touch created by the user
-        :return: True when touch is down and the widget is not disabled
-        """
-        if not self.disabled:
-            user_data = touch.ud
-            user_data['line'] = Line(points=(touch.x, touch.y))
-            # print touch.x, touch.y  # Debug
-            return True
-        else:
-            pass
-
-    def on_touch_move(self, touch):
-        """
-        Method that records the movement of the touch
-        :param touch: the touch created by the user
-        :return: True when touch is moving and the widget is not disabled
-        """
-        if not self.disabled:
-            try:
-                touch.ud['line'].points += [touch.x, touch.y]
-            except KeyError:
-                pass
-            return True
-        else:
-            pass
-
-    def on_touch_up(self, touch):
-        """
-        Method that checks the performed gesture and performs the assigned actions
-        :param touch: the touch created by the user
-        :return: True when touch is gone
-        """
-        if not self.disabled:
-            global cur_screen
-            try:
-                gesture = self.make_gesture(list(zip(touch.ud['line'].points[::2], touch.ud['line'].points[1::2])))
-
-                # print("Left to Right:", gesture.get_score(swipe_l_r))  # Debug
-                # print("Right to Left:", gesture.get_score(swipe_r_l))  # Debug
-
-                gesture2 = self.gdb.find(gesture, minscore=settings["general"]["touch_min_score"])
-
-                # print(gesture2)  # Debug
-
-                if gesture2 is None:
-                    return
-
-                if gesture2[1] == swipe_l_r:
-                    if cur_screen > 0:
-                        previous_screen()
-                    # print "L-R"  # Debug
-                elif gesture2[1] == swipe_r_l:
-                    next_screen()
-                    # print "R-L"  # Debug
-            except KeyError or TypeError:
-                pass
-        else:
-            pass
 
 
 class Header(GridLayout):

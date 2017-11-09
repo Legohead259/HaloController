@@ -8,10 +8,6 @@
 
 <ManeuverIcon>:
 
-<GestureBox>:
-    id: gesture_box
-    disabled: False
-
 <HeaderIcon@Image>:
     size_hint_x: None
     width: 55
@@ -127,8 +123,6 @@
     Footer:
         id: fs_footer
         opacity: 1
-    GestureBox:
-        disabled: True
 
 <ToolBar>:
 
@@ -168,8 +162,6 @@
             id: move_to
             source: os.path.abspath("icons/DroneIcon.png")
             on_release: self.update_map_mode()
-    GestureBox:
-        disabled: True
 
 <Video>:
     canvas.before:
@@ -187,8 +179,6 @@
     Footer:
         id: fs_footer
         opacity: 1
-    GestureBox:
-        disabled: False
 
 
 <Diagnostics>:
@@ -201,8 +191,6 @@
     name: 'Diagnostics'
     Background:
     Footer:
-    GestureBox:
-        disabled: False
 
 <SettingsButton>
     size_hint_y: None
@@ -238,5 +226,3 @@
             height: self.minimum_height
             cols: 2
     Footer:
-    GestureBox:
-        disabled: False

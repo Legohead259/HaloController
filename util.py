@@ -45,3 +45,16 @@ def next_screen(cs, s, sm):
     temp += 1
     sm.switch_to(s[temp], direction="left")
     return temp
+
+
+def map(x, in_min, in_max, out_min, out_max):
+    """
+    Function that converts a value between two different scales
+    :param x: The value to be converted
+    :param in_min: the minimum of the input range
+    :param in_max: the maximum of the input range
+    :param out_min: the minimum of the output range
+    :param out_max: the maximum of the output range
+    :return: the value converted to the output range.
+    """
+    return int((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
