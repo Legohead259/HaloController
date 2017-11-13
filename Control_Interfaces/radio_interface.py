@@ -1,4 +1,5 @@
 import serial
+import re
 
 port = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
 
@@ -7,7 +8,7 @@ coefficients = {"Link Request": 0x01, "Link Acknowledge": 0x02, "Throttle": 0x03
                 "Y_Acceleration": 0x0B, "Z_Acceleration": 0x0C, "Drone_GPS_Latitude": 0x0D, "Drone_GPS_Longitude": 0x0E,
                 "Controller_GPS_Latitude": 0x0F, "Controller_GPS_Longitude": 0x10, "Altitude": 0x11, "Fail": 0x12}
 
-input_buffer = []
+input_buffer = ""
 
 
 def receive():
@@ -16,14 +17,23 @@ def receive():
     Examples of expected data:
         "0x01",
         "0x02",
-        "0x04:DATA,0x05:DATA,0x06:DATA,0x07:DATA,0x08:DATA,0x09:DATA,0x0A:DATA,0x0B:DATA,0x0C:DATA,
-            0x0D:DATA,0x0E:DATA,0x11:DATA",
+        "0x04:DATA,0x05:DATA,0x06:DATA,0x07:DATA,0x08:DATA,0x09:DATA,0x0A:DATA,0x0B:DATA,0x0C:DATA,0x0D:DATA,0x0E:DATA,0x11:DATA",
         "0x12"
     """
     global input_buffer
 
-    input_buffer = port.readline()
-    print "Received:", input_buffer  # Debug
+    try:
+        read = port.readline()
+        input_buffer = read
+        print "Received:", input_buffer  # Debug
+
+        parse_data()
+        verify_data()
+
+        return input_buffer
+    except ValueError:
+        send(coefficients["Fail"])
+        return receive()
 
 
 def send(val):
@@ -37,3 +47,15 @@ def send(val):
     """
     port.write(val)
     print "Sent:", val  # Debug
+
+
+def parse_data():
+    parsed = re.split('[:,]', input_buffer)
+
+
+def verify_data():
+    """
+    Function that verifies that received data meets standards
+    :return: -1 if failed, 0 if verified
+    """
+    pass
