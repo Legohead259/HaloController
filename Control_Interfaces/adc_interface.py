@@ -13,6 +13,7 @@ values_pwm = []
 
 bus = SMBus(1)
 
+
 # =====START CRITICAL FUNCTIONS=====
 
 
@@ -44,6 +45,8 @@ def parse_to_volts(data):
     """
     global values_volt
 
+    values_volt = []
+
     parse(data)
 
     c = 0
@@ -63,6 +66,8 @@ def parse_to_pwm(data):
     :param data: raw adc values
     """
     global values_pwm
+
+    values_pwm = []
 
     parse_to_volts(data)
 

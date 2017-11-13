@@ -1,6 +1,8 @@
 import Control_Interfaces
 
 adc_data = []
+input_buffer = []
+output_buffer = []
 
 
 def get_data():
