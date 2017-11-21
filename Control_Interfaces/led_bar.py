@@ -1,4 +1,5 @@
 from smbus import SMBus
+from collections import deque
 import time
 import random
 
@@ -43,8 +44,8 @@ r = 255
 g = 0
 b = 0
 
-start_rainbow = [off, off, off, max, off, off, max, 0xA5, off, max, max, off, off, max, off, off, off, max, 0x40, off, 0x82,
-           0xEE, 0x82, 0xEE, off, off, off]
+start_rainbow = deque([max, off, off, max, 0xA5, off, max, max, off, off, max, off, off, off, max, 0x40,
+                       off, 0x82, 0xEE, 0x82, 0xEE])
 
 
 def increase(color, rate, color_str):
@@ -66,21 +67,9 @@ def decrease(color, rate, color_str):
 
 
 def rainbow_scroll():
-    temp = start_rainbow
-
-    while True:
-        c = 0
-        for color in temp:
-            if c == len(temp) - 1:
-                temp[0] = temp[c]
-                print temp[c]  # Debug
-            else:
-                temp[c] = temp[c+1]
-                print temp[c]  # Debug
-                c += 1
-
-        write_leds(leds["led_1_r"], temp)
-        time.sleep(.1)
+    write_leds(leds["led_1_r"], list(start_rainbow))
+    start_rainbow.rotate()
+    time.sleep(.125)
 
 
 def update_rainbow(color, color_str):
@@ -152,7 +141,6 @@ def led_rainbow(led, num_led=1):
 
 def setup():
     bus.write_byte_data(driver_adr, shutdown_adr, 0x01)  # Turn on LEDs
-    make_rainbow(8)
     led_block = []
     for cmd in range(0, 25):
         led_block.append(led_on_quart)
@@ -163,20 +151,17 @@ def setup():
 
 def loop():
     while True:
-        # write_leds(leds["led_1_r"], start_rainbow)
         rainbow_scroll()
-        # led_rainbow(leds["led_1_r"], random.randint(1, 8))
-        # breathe(leds["led_1_r"])
+
+
+if __name__ == "__main__":
+    try:
+        setup()
+        loop()
+
+    except KeyboardInterrupt:
         pass
 
-
-try:
-    setup()
-    loop()
-
-except KeyboardInterrupt:
-    pass
-
-finally:
-    bus.write_byte_data(driver_adr, shutdown_adr, 0x00)
-    bus.write_byte_data(driver_adr, reset_adr, 0x4F)
+    finally:
+        bus.write_byte_data(driver_adr, shutdown_adr, 0x00)
+        bus.write_byte_data(driver_adr, reset_adr, 0x4F)
