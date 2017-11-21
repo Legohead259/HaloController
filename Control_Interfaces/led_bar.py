@@ -69,7 +69,7 @@ def decrease(color, rate, color_str):
 def rainbow_scroll():
     write_leds(leds["led_1_r"], list(start_rainbow))
     start_rainbow.rotate()
-    time.sleep(.125)
+    time.sleep(.0125)
 
 
 def update_rainbow(color, color_str):
@@ -88,7 +88,7 @@ def update_rainbow(color, color_str):
 
 # print rainbow_temp  #Debug
 
-def make_rainbow(rate):
+def make_rainbow(rate=8):
     global rainbow
     rate = int(255 / rate)
 
@@ -99,7 +99,7 @@ def make_rainbow(rate):
     increase(r, rate, "r")  # Changes color to MAGENTA
     decrease(b, rate, "b")  # Changes color to RED
 
-    rainbow = list(reversed(rainbow_temp))
+    rainbow = list(rainbow_temp)
 
 
 # Bus Creation
@@ -130,7 +130,8 @@ def breathe(led, num_led=1):
         # print brightness-1, ":", spectrum[brightness - 1]  #Debug: prints the index number of spectrum and the value
 
 
-def led_rainbow(led, num_led=1):
+def led_rainbow(led, rate, num_led=1):
+    make_rainbow(rate)
     for color in rainbow:
         # print color  #Debug: prints the color
         # make_color(led, color, num_led)
@@ -147,11 +148,33 @@ def setup():
     bus.write_i2c_block_data(driver_adr, 0x28, led_block)  # Activate LEDS
     # print led_on_full_block  #Debug
     update_leds()
+    make_rainbow()
 
 
 def loop():
+    global rainbow
+
+    print rainbow  # Debug
+
+    # temp = []
+    # for l in rainbow:
+    #     temp.append(l)
+    # print temp  # Debug
+    # temp = deque(temp)
+
+    rainbow = deque(rainbow)
+
     while True:
-        rainbow_scroll()
+        temp = []
+        for l in range(0, 9):
+            temp += rainbow[l]
+        print temp  # Debug
+
+        write_leds(leds["led_1_r"], temp)
+        rainbow.rotate()
+        time.sleep(0.0625)
+        # led_rainbow(leds["led_1_r"], 8, 8)
+        # rainbow_scroll()
 
 
 if __name__ == "__main__":
