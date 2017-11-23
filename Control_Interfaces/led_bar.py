@@ -1,186 +1,186 @@
 from smbus import SMBus
 from collections import deque
 import time
-import random
+
+
+# =====GLOBAL DEFINITIONS=====
+
 
 # LED Power Modes
-led_on_full = 0x01
-led_on_half = 0x02
-led_on_quart = 0x07
-led_off = 0x00
+_led_on_full = 0x01
+_led_on_half = 0x03
+_led_on_quart = 0x07
+_led_off = 0x00
 
 # LED Brightnesses
-max = 255
-off = 0
+_max = 255
+_off = 0
 
 # Addresses
-update_adr = 0x25
-driver_adr = 0x3F
-shutdown_adr = 0x00
-reset_adr = 0x4F
+_update_adr = 0x25
+_driver_adr = 0x3F
+_shutdown_adr = 0x00
+_reset_adr = 0x4F
 
 # LED Registers
-leds = {"led_1_r": 0x03, "led_1_g": 0x04, "led_1_b": 0x05, "led_2_r": 0x06, "led_2_g": 0x07, "led_2_b": 0x08,
-        "led_3_r": 0x09, "led_3_g": 0x0A, "led_3_b": 0x0B, "led_4_r": 0x0C, "led_4_g": 0x0D, "led_4_b": 0x0E,
-        "led_5_r": 0x0F, "led_5_g": 0x10, "led_5_b": 0x11, "led_6_r": 0x12, "led_6_g": 0x13, "led_6_b": 0x14,
-        "led_7_r": 0x15, "led_7_g": 0x16, "led_7_b": 0x17, "led_8_r": 0x18, "led_8_g": 0x19, "led_8_b": 0x1A}
+_leds = {"1r": 0x03, "1g": 0x04, "1b": 0x05, "2r": 0x06, "2g": 0x07, "2b": 0x08,
+         "3r": 0x09, "3g": 0x0A, "3b": 0x0B, "4r": 0x0C, "4g": 0x0D, "4b": 0x0E,
+         "5r": 0x0F, "5g": 0x10, "5b": 0x11, "6r": 0x12, "6g": 0x13, "6b": 0x14,
+         "7r": 0x15, "7g": 0x16, "7b": 0x17, "8r": 0x18, "8g": 0x19, "8b": 0x1A}
 
 # Brightness Spectrum
-spectrum = []
-for x in range(0, 256, 4):
-    spectrum.append(x)
-# print len(spectrum)  #Debug: prints the length of spectrum
-# print spectrum  #Debug: prints the spectrum list
+b_spectrum = []
+for x in range(0, 256, 4):  # To change rate of brightness change, edit third parameter
+    b_spectrum.append(x)
 
-# Rainbow Spectrums
-rainbow_temp = []
-rainbow = []
-r = 255
-g = 0
-b = 0
-
-start_rainbow = deque([max, off, off, max, 0xA5, off, max, max, off, off, max, off, off, off, max, 0x40,
-                       off, 0x82, 0xEE, 0x82, 0xEE])
-
-
-def increase(color, rate, color_str):
-    while color != 255:
-        if color + rate < 255:
-            color += rate
-        else:
-            color = 255
-        update_rainbow(color, color_str)
-
-
-def decrease(color, rate, color_str):
-    while color != 0:
-        if color - rate > 0:
-            color -= rate
-        else:
-            color = 0
-        update_rainbow(color, color_str)
-
-
-def rainbow_scroll():
-    global rainbow
-
-    temp = []
-    for l in range(0, 9):
-        temp += rainbow[l]
-    print temp  # Debug
-    temp = temp
-
-    rainbow = deque(rainbow)
-
-    write_leds(leds["led_1_r"], temp)
-    rainbow.rotate()
-    time.sleep(0.03125)
-
-
-def update_rainbow(color, color_str):
-    global r
-    global g
-    global b
-
-    if color_str == "r":
-        r = color
-    elif color_str == "g":
-        g = color
-    elif color_str == "b":
-        b = color
-    rainbow_temp.append([r, g, b])
-
-
-# print rainbow_temp  #Debug
-
-def make_rainbow(rate=8):
-    global rainbow
-    rate = int(255 / rate)
-
-    increase(g, rate, "g")  # Changes color to YELLOW
-    decrease(r, rate, "r")  # Changes color to GREEN
-    increase(b, rate, "b")  # Changes color to CYAN
-    decrease(g, rate, "g")  # Changes color to BLUE
-    increase(r, rate, "r")  # Changes color to MAGENTA
-    decrease(b, rate, "b")  # Changes color to RED
-
-    rainbow = list(rainbow_temp)
-
+# Color Spectrum
+c_spectrum = []
 
 # Bus Creation
 bus = SMBus(1)  # Creates new bus on channel 1
 
 
-def update_leds():
-    bus.write_byte_data(driver_adr, update_adr, 0x00)  # Sends update command to driver
+# =====COLOR SPECTRUM FUNCTIONS=====
 
 
-def write_leds(start_led, data):
-    bus.write_i2c_block_data(driver_adr, start_led, data)
-    update_leds()
+def increase(color, rate, color_idx):
+    """
+    Increases the specified color by the given rate
+    :param color: the color block as a list ([r, g, b])
+    :param rate: the rate of change
+    :param color_idx: the index identifier of the color; 0 (r), 1 (g), or 2 (b)
+    """
+    while color[color_idx] != 0:
+        if color[color_idx] + rate > 0:
+            color[color_idx] += rate
+        else:
+            color[color_idx] = 0
+        c_spectrum.append(color)
 
 
-# print data  #Debug: prints the data to be sent
+def decrease(color, rate, color_idx):
+    """
+    Decreases the specified color by the given rate
+    :param color: the color block as a list ([r, g, b])
+    :param rate: the rate of change
+    :param color_idx: the index identifier of the color; 0 (r), 1 (g), or 2 (b)
+    """
+    while color[color_idx] != 0:
+        if color[color_idx] - rate > 0:
+            color[color_idx] -= rate
+        else:
+            color[color_idx] = 0
+        c_spectrum.append(color)
 
-def breathe(led, num_led=1):
-    for brightness in spectrum:  # Increase in brightness from off to max
-        write_leds(led, [brightness]*num_led)
-        time.sleep(0.1)
-    # print(brightness)  #Debug: prints brightness values
-    # print brightness, ":", spectrum[brightness]  #Debug: prints the index number of spectrum and the value
-    for brightness in list(reversed(spectrum)):  # Decrease in brightness from max to off
-        write_leds(led, [brightness]*num_led)
-        time.sleep(0.1)
-        # print(brightness)  #Debug: prints brightness value
-        # print brightness-1, ":", spectrum[brightness - 1]  #Debug: prints the index number of spectrum and the value
+
+def make_spectrum(rate=8):
+    """
+    Creates the color spectrum used by spectrum_scroll()
+    RECOMMENDED: Call this first in a setup function before scrolling
+    :param rate: the rate of spectra divisions
+    """
+    global c_spectrum
+
+    _rate = int(255 / rate)
+    color = [255, 0, 0]
+
+    increase(color, _rate, 1)  # Changes color to YELLOW
+    decrease(color, _rate, 0)  # Changes color to GREEN
+    increase(color, _rate, 2)  # Changes color to CYAN
+    decrease(color, _rate, 1)  # Changes color to BLUE
+    increase(color, _rate, 0)  # Changes color to MAGENTA
+    decrease(color, _rate, 2)  # Changes color to RED
 
 
-def led_rainbow(led, rate, num_led=1):
-    make_rainbow(rate)
-    for color in rainbow:
-        # print color  #Debug: prints the color
-        # make_color(led, color, num_led)
-        write_leds(led, color * num_led)
-        time.sleep(0.1)
-    write_leds(led, [off, off, off] * num_led)  # Clean up LEDs
+def spectrum_scroll():
+    """
+    Function that scrolls through the entire spectrum of colors
+    """
+    c_spectrum_temp = deque(c_spectrum)
+
+    temp = []
+    for l in range(0, 9):
+        temp += list(c_spectrum_temp)[l]
+
+    write(temp, _leds["1r"])
+    c_spectrum_temp.rotate()
+    time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
+
+
+# =====BRIGHTNESS FUNCTIONS=====
+
+
+def breathe(_led=_leds["1r"], _num_led=1):
+    """
+    Function that breathes a set of LEDs based on their BRIGHTNESS
+    :param _led: the starting LED
+    :param _num_led: the number of LEDs after the start one that are to be changed as well
+    """
+    delay = 0.1
+
+    for brightness in b_spectrum:  # Increase in brightness from off to max
+        write([brightness]*_num_led, _led)
+        time.sleep(delay)
+    for brightness in reversed(b_spectrum):  # Decrease in brightness from max to off
+        write([brightness]*_num_led, _led)
+        time.sleep(delay)
+
+
+# =====UTILITY FUNCTIONS=====
+
+
+def write(_data, _start_led=_leds["1r"], _reg=0):
+    """
+    Writes new data to LED driver and automatically updates it
+    :param _data: the data to send to the LED driver
+    :param _start_led: the first LED to interact with
+    :param _reg: the register to send data to on the LED driver
+    """
+    if _reg != 0:
+        bus.write_byte_data(_driver_adr, _reg, _data)
+    else:
+        bus.write_i2c_block_data(_driver_adr, _start_led, _data)
+
+    bus.write_byte_data(_driver_adr, _update_adr, 0x00)  # Sends update command to driver
+
+
+# =====OPERATION FUNCTIONS=====
 
 
 def setup():
-    bus.write_byte_data(driver_adr, shutdown_adr, 0x01)  # Turn on LEDs
+    """
+    Sets up LED driver with proper power settings and initializes any global variable necessary for operation
+    """
+    # Turn on LEDs
+    write(0x01, _reg=_shutdown_adr)
+
+    # Activate LEDs at set current
     led_block = []
-    for cmd in range(0, 25):
-        led_block.append(led_on_quart)
-    bus.write_i2c_block_data(driver_adr, 0x28, led_block)  # Activate LEDS
-    # print led_on_full_block  #Debug
-    update_leds()
-    make_rainbow()
+    for i in range(0, 25):
+        led_block.append(_led_on_quart)  # To change current through LEDs edit the appended code
+    write(led_block, _reg=0x28)  # NOTE: 0x28 is the setup code for LED 1R
+
+    # Create color spectrum
+    make_spectrum()
 
 
-def loop():
-    # temp = []
-    # for l in rainbow:
-    #     temp.append(l)
-    # print temp  # Debug
-    # temp = deque(temp)
-
-    while True:
-        # led_rainbow(leds["led_1_r"], 8, 8)
-        rainbow_scroll()
-        pass
-
-
-def finish():
-    bus.write_byte_data(driver_adr, shutdown_adr, 0x00)  # Shuts down LEDs
-    bus.write_byte_data(driver_adr, reset_adr, 0x4F)  # Resets LED registers
-
-
-if __name__ == "__main__":
+def test():
+    """
+    Basic testing to ensure functionality of any operation
+    NOTE: To test operation, place command in the while loop
+    """
     try:
         setup()
-        loop()
-
-    except KeyboardInterrupt:
-        pass
-
+        while True:
+            spectrum_scroll()
     finally:
-        finish()
+        clean()
+
+
+def clean():
+    """
+    Cleans up LED driver to ensure smooth transition between operations
+    :return:
+    """
+    bus.write_byte_data(_driver_adr, _shutdown_adr, 0x00)  # Shuts down LEDs
+    bus.write_byte_data(_driver_adr, _reset_adr, 0x4F)  # Resets LED registers
