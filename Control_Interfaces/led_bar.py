@@ -33,8 +33,10 @@ b_spectrum = []
 for x in range(0, 256, 4):  # To change rate of brightness change, edit third parameter
     b_spectrum.append(x)
 
-# Color Spectrum
+# Color Spectrum variables
 c_spectrum = []
+c_spectrum_temp = deque()
+color = [255, 0, 0]
 
 # Bus Creation
 bus = SMBus(1)  # Creates new bus on channel 1
@@ -43,25 +45,23 @@ bus = SMBus(1)  # Creates new bus on channel 1
 # =====COLOR SPECTRUM FUNCTIONS=====
 
 
-def increase(color, rate, color_idx):
+def increase(rate, color_idx):
     """
     Increases the specified color by the given rate
-    :param color: the color block as a list ([r, g, b])
     :param rate: the rate of change
     :param color_idx: the index identifier of the color; 0 (r), 1 (g), or 2 (b)
     """
-    while color[color_idx] != 0:
-        if color[color_idx] + rate > 0:
+    while color[color_idx] != 255:
+        if color[color_idx] + rate < 255:
             color[color_idx] += rate
         else:
-            color[color_idx] = 0
-        c_spectrum.append(color)
+            color[color_idx] = 255
+        c_spectrum.append(list(color[:]))
 
 
-def decrease(color, rate, color_idx):
+def decrease(rate, color_idx):
     """
     Decreases the specified color by the given rate
-    :param color: the color block as a list ([r, g, b])
     :param rate: the rate of change
     :param color_idx: the index identifier of the color; 0 (r), 1 (g), or 2 (b)
     """
@@ -70,7 +70,7 @@ def decrease(color, rate, color_idx):
             color[color_idx] -= rate
         else:
             color[color_idx] = 0
-        c_spectrum.append(color)
+        c_spectrum.append(list(color[:]))
 
 
 def make_spectrum(rate=8):
@@ -79,27 +79,22 @@ def make_spectrum(rate=8):
     RECOMMENDED: Call this first in a setup function before scrolling
     :param rate: the rate of spectra divisions
     """
-    global c_spectrum
-
     _rate = int(255 / rate)
-    color = [255, 0, 0]
 
-    increase(color, _rate, 1)  # Changes color to YELLOW
-    decrease(color, _rate, 0)  # Changes color to GREEN
-    increase(color, _rate, 2)  # Changes color to CYAN
-    decrease(color, _rate, 1)  # Changes color to BLUE
-    increase(color, _rate, 0)  # Changes color to MAGENTA
-    decrease(color, _rate, 2)  # Changes color to RED
+    increase(_rate, 1)  # Changes color to YELLOW
+    decrease(_rate, 0)  # Changes color to GREEN
+    increase(_rate, 2)  # Changes color to CYAN
+    decrease(_rate, 1)  # Changes color to BLUE
+    increase(_rate, 0)  # Changes color to MAGENTA
+    decrease(_rate, 2)  # Changes color to RED
 
 
 def spectrum_scroll():
     """
     Function that scrolls through the entire spectrum of colors
     """
-    c_spectrum_temp = deque(c_spectrum)
-
     temp = []
-    for l in range(0, 9):
+    for l in range(0, 8):
         temp += list(c_spectrum_temp)[l]
 
     write(temp, _leds["1r"])
@@ -129,14 +124,16 @@ def breathe(_led=_leds["1r"], _num_led=1):
 # =====UTILITY FUNCTIONS=====
 
 
-def write(_data, _start_led=_leds["1r"], _reg=0):
+def write(_data, _start_led=_leds["1r"], _reg=-1):
     """
     Writes new data to LED driver and automatically updates it
     :param _data: the data to send to the LED driver
     :param _start_led: the first LED to interact with
     :param _reg: the register to send data to on the LED driver
     """
-    if _reg != 0:
+    if _reg == 0x28:
+        bus.write_i2c_block_data(_driver_adr, _reg, _data)
+    elif _reg != -1:
         bus.write_byte_data(_driver_adr, _reg, _data)
     else:
         bus.write_i2c_block_data(_driver_adr, _start_led, _data)
@@ -144,13 +141,15 @@ def write(_data, _start_led=_leds["1r"], _reg=0):
     bus.write_byte_data(_driver_adr, _update_adr, 0x00)  # Sends update command to driver
 
 
-# =====OPERATION FUNCTIONS=====
+# =====IMPLEMENTATION FUNCTIONS=====
 
 
 def setup():
     """
     Sets up LED driver with proper power settings and initializes any global variable necessary for operation
     """
+    global c_spectrum_temp
+
     # Turn on LEDs
     write(0x01, _reg=_shutdown_adr)
 
@@ -162,6 +161,7 @@ def setup():
 
     # Create color spectrum
     make_spectrum()
+    c_spectrum_temp = deque(c_spectrum)
 
 
 def test():
@@ -173,7 +173,10 @@ def test():
         setup()
         while True:
             spectrum_scroll()
+    except KeyboardInterrupt:
+        print "Exiting..."
     finally:
+        print "Cleaning..."
         clean()
 
 

@@ -68,7 +68,7 @@ def rainbow_scroll():
     for l in range(0, 9):
         temp += rainbow[l]
     print temp  # Debug
-    temp = temp
+    # temp = temp
 
     rainbow = deque(rainbow)
 
