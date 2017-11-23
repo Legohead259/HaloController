@@ -89,12 +89,13 @@ def make_spectrum(rate=8):
     decrease(_rate, 2)  # Changes color to RED
 
 
-def spectrum_scroll():
+def spectrum_scroll(_num_led=8):
     """
     Scrolls through entire color spectrum. Is defined by color shifting up by 1 LED
+    :param _num_led: the number of LEDs through which the transition will flow. Default/max is 8, min is 1
     """
     temp = []
-    for l in range(0, 8):
+    for l in range(0, 8/_num_led):
         temp += list(c_spectrum_temp)[l]
 
     write(temp, _leds["1r"])
@@ -102,6 +103,7 @@ def spectrum_scroll():
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
 
+@DeprecationWarning
 def long_spectrum_scroll():
     """
     Scrolls through entire color spectrum. Is defined by color shifting through ENTIRE bar
@@ -181,8 +183,8 @@ def test():
     try:
         setup()
         while True:
-            # spectrum_scroll()
-            long_spectrum_scroll()
+            spectrum_scroll()
+            # long_spectrum_scroll()
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
