@@ -14,6 +14,7 @@
         <list>
           <option value="TypeError" />
           <option value="map" />
+          <option value="max" />
         </list>
       </option>
     </inspection_tool>
