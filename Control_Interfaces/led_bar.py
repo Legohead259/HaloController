@@ -98,7 +98,7 @@ def spectrum_scroll(_num_led=8):
     for l in range(0, 8/_num_led):
         temp += list(c_spectrum_temp)[l]
 
-    write(temp, _leds["1r"])
+    write(temp*_num_led)
     c_spectrum_temp.rotate()
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
@@ -108,8 +108,19 @@ def long_spectrum_scroll():
     """
     Scrolls through entire color spectrum. Is defined by color shifting through ENTIRE bar
     """
-    write(c_spectrum_temp[1]*8, _leds["1r"])
+    write(c_spectrum_temp[1]*8)
     c_spectrum_temp.rotate()
+    time.sleep(0.03125)
+
+
+def spectrum_scroll_direction(dir=1):
+    """
+    Scrolls through spectrum in a given direction.
+    NOTE: Speed of scrolling can also be set here, however that is not recommended
+    :param dir: the direction of the scrolling. LEFT is NEGATIVE, RIGHT is POSITIVE
+    """
+    write(c_spectrum_temp[1]*8)
+    c_spectrum_temp.rotate(1*dir)
     time.sleep(0.03125)
 
 
@@ -183,8 +194,9 @@ def test():
     try:
         setup()
         while True:
-            spectrum_scroll()
+            # spectrum_scroll()
             # long_spectrum_scroll()
+            spectrum_scroll_direction(-1)
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
