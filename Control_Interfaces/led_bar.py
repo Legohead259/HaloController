@@ -112,9 +112,6 @@ def long_spectrum_scroll():
     c_spectrum_temp.rotate()
     time.sleep(0.03125)
 
-def thisandthat():
-    pass
-
 
 def spectrum_scroll_direction(dir=1):
     """
