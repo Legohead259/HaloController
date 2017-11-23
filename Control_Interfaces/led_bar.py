@@ -119,9 +119,13 @@ def spectrum_scroll_direction(dir=1):
     NOTE: Speed of scrolling can also be set here, however that is not recommended
     :param dir: the direction of the scrolling. LEFT is NEGATIVE, RIGHT is POSITIVE
     """
-    write(c_spectrum_temp[1]*8)
-    c_spectrum_temp.rotate(1*dir)
-    time.sleep(0.03125)
+    temp = []
+    for l in range(0, 8):
+        temp += list(c_spectrum_temp)[l]
+
+    write(temp)
+    c_spectrum_temp.rotate(dir)
+    time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
 
 # =====BRIGHTNESS FUNCTIONS=====
