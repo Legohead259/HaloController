@@ -11,11 +11,6 @@ led_off = 0x00
 
 # LED Brightnesses
 max = 255
-two_thirds = 170
-three_quart = 191
-half = 127
-third = 85
-quarter = 64
 off = 0
 
 # Addresses
@@ -67,9 +62,19 @@ def decrease(color, rate, color_str):
 
 
 def rainbow_scroll():
-    write_leds(leds["led_1_r"], list(start_rainbow))
-    start_rainbow.rotate()
-    time.sleep(.0125)
+    global rainbow
+
+    temp = []
+    for l in range(0, 9):
+        temp += rainbow[l]
+    print temp  # Debug
+    temp = temp
+
+    rainbow = deque(rainbow)
+
+    write_leds(leds["led_1_r"], temp)
+    rainbow.rotate()
+    time.sleep(0.03125)
 
 
 def update_rainbow(color, color_str):
@@ -152,29 +157,21 @@ def setup():
 
 
 def loop():
-    global rainbow
-
-    print rainbow  # Debug
-
     # temp = []
     # for l in rainbow:
     #     temp.append(l)
     # print temp  # Debug
     # temp = deque(temp)
 
-    rainbow = deque(rainbow)
-
     while True:
-        temp = []
-        for l in range(0, 9):
-            temp += rainbow[l]
-        print temp  # Debug
-
-        write_leds(leds["led_1_r"], temp)
-        rainbow.rotate()
-        time.sleep(0.0625)
         # led_rainbow(leds["led_1_r"], 8, 8)
-        # rainbow_scroll()
+        rainbow_scroll()
+        pass
+
+
+def finish():
+    bus.write_byte_data(driver_adr, shutdown_adr, 0x00)  # Shuts down LEDs
+    bus.write_byte_data(driver_adr, reset_adr, 0x4F)  # Resets LED registers
 
 
 if __name__ == "__main__":
@@ -186,5 +183,4 @@ if __name__ == "__main__":
         pass
 
     finally:
-        bus.write_byte_data(driver_adr, shutdown_adr, 0x00)
-        bus.write_byte_data(driver_adr, reset_adr, 0x4F)
+        finish()
