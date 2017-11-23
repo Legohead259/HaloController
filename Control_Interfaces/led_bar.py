@@ -98,7 +98,7 @@ def spectrum_scroll(_num_led=8):
     for l in range(0, 8/_num_led):
         temp += list(c_spectrum_temp)[l]
 
-    write(temp, _leds["1r"])
+    write(temp*_num_led, _leds["1r"])
     c_spectrum_temp.rotate()
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
@@ -183,7 +183,7 @@ def test():
     try:
         setup()
         while True:
-            spectrum_scroll()
+            spectrum_scroll(1)
             # long_spectrum_scroll()
     except KeyboardInterrupt:
         print "Exiting..."
@@ -195,7 +195,6 @@ def test():
 def clean():
     """
     Cleans up LED driver to ensure smooth transition between operations
-    :return:
     """
     bus.write_byte_data(_driver_adr, _shutdown_adr, 0x00)  # Shuts down LEDs
     bus.write_byte_data(_driver_adr, _reset_adr, 0x4F)  # Resets LED registers
