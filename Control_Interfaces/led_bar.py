@@ -35,7 +35,9 @@ for x in range(0, 256, 4):  # To change rate of brightness change, edit third pa
 
 # Color Spectrum variables
 c_spectrum = []
-c_spectrum_temp = deque()
+c_spectrum_d1 = deque()
+c_spectrum_d2 = deque()
+c_spectra = []
 color = [255, 0, 0]
 
 # Bus Creation
@@ -97,20 +99,29 @@ def spectrum_scroll(num_led=8, dir=1):
     """
     temp = []
     for l in range(0, 8/num_led):
-        temp += list(c_spectrum_temp)[l]
+        temp += list(c_spectrum_d1)[l]
 
     write(temp*num_led)
-    c_spectrum_temp.rotate(dir)
+    c_spectrum_d1.rotate(dir)
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
+
+def fancy_spectrum_scroll(num_led=2):
+    temp = []
+    for l in range(0, 8 / num_led):
+        temp += list(c_spectrum_d1)[l]
+
+    write(temp+reversed(temp))
+    c_spectrum_d1.rotate(dir)
+    time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
 @DeprecationWarning
 def long_spectrum_scroll():
     """
     Scrolls through entire color spectrum. Is defined by color shifting through ENTIRE bar
     """
-    write(c_spectrum_temp[1]*8)
-    c_spectrum_temp.rotate()
+    write(c_spectrum_d1[1] * 8)
+    c_spectrum_d1.rotate()
     time.sleep(0.03125)
 
 
@@ -123,10 +134,10 @@ def spectrum_scroll_direction(dir=1):
     """
     temp = []
     for l in range(0, 8):
-        temp += list(c_spectrum_temp)[l]
+        temp += list(c_spectrum_d1)[l]
 
     write(temp)
-    c_spectrum_temp.rotate(dir)
+    c_spectrum_d1.rotate(dir)
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
 
@@ -176,7 +187,7 @@ def setup():
     """
     Sets up LED driver with proper power settings and initializes any global variable necessary for operation
     """
-    global c_spectrum_temp
+    global c_spectrum_d1, c_spectrum_d2
 
     # Turn on LEDs
     write(0x01, reg=_shutdown_adr)
@@ -189,7 +200,10 @@ def setup():
 
     # Create color spectrum
     make_spectrum()
-    c_spectrum_temp = deque(c_spectrum)
+    c_spectrum_d1 = deque(c_spectrum)
+    c_spectrum_d2 = deque(c_spectrum)
+    c_spectra.append(c_spectrum_d1)
+    c_spectra.append(c_spectrum_d2)
 
 
 def test():
