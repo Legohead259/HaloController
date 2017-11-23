@@ -91,7 +91,7 @@ def make_spectrum(rate=8):
 
 def spectrum_scroll():
     """
-    Function that scrolls through the entire spectrum of colors
+    Scrolls through entire color spectrum. Is defined by color shifting up by 1 LED
     """
     temp = []
     for l in range(0, 8):
@@ -100,6 +100,15 @@ def spectrum_scroll():
     write(temp, _leds["1r"])
     c_spectrum_temp.rotate()
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
+
+
+def long_spectrum_scroll():
+    """
+    Scrolls through entire color spectrum. Is defined by color shifting through ENTIRE bar
+    """
+    write(c_spectrum_temp[1]*8, _leds["1r"])
+    c_spectrum_temp.rotate()
+    time.sleep(0.03125)
 
 
 # =====BRIGHTNESS FUNCTIONS=====
@@ -172,7 +181,8 @@ def test():
     try:
         setup()
         while True:
-            spectrum_scroll()
+            # spectrum_scroll()
+            long_spectrum_scroll()
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
