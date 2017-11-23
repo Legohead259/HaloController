@@ -89,17 +89,19 @@ def make_spectrum(rate=8):
     decrease(_rate, 2)  # Changes color to RED
 
 
-def spectrum_scroll(_num_led=8):
+def spectrum_scroll(num_led=8, dir=1, start_led=_leds["1r"]):
     """
     Scrolls through entire color spectrum. Is defined by color shifting up by 1 LED
-    :param _num_led: the number of LEDs through which the transition will flow. Default/max is 8, min is 1
+    :param num_led: the number of LEDs through which the transition will flow. Default/max is 8, min is 1
+    :param dir: the direction of the scrolling. LEFT is NEGATIVE, RIGHT is POSITIVE
+    :param start_led: the first LED to interact with
     """
     temp = []
-    for l in range(0, 8/_num_led):
+    for l in range(0, 8/num_led):
         temp += list(c_spectrum_temp)[l]
 
-    write(temp*_num_led)
-    c_spectrum_temp.rotate()
+    write(temp*num_led, start_led)
+    c_spectrum_temp.rotate(dir)
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
 
@@ -113,6 +115,7 @@ def long_spectrum_scroll():
     time.sleep(0.03125)
 
 
+@DeprecationWarning
 def spectrum_scroll_direction(dir=1):
     """
     Scrolls through spectrum in a given direction.
@@ -131,38 +134,38 @@ def spectrum_scroll_direction(dir=1):
 # =====BRIGHTNESS FUNCTIONS=====
 
 
-def breathe(_led=_leds["1r"], _num_led=1):
+def breathe(led=_leds["1r"], num_led=1):
     """
     Function that breathes a set of LEDs based on their BRIGHTNESS
-    :param _led: the starting LED
-    :param _num_led: the number of LEDs after the start one that are to be changed as well
+    :param led: the starting LED
+    :param num_led: the number of LEDs after the start one that are to be changed as well
     """
     delay = 0.1
 
     for brightness in b_spectrum:  # Increase in brightness from off to max
-        write([brightness]*_num_led, _led)
+        write([brightness]*num_led, led)
         time.sleep(delay)
     for brightness in reversed(b_spectrum):  # Decrease in brightness from max to off
-        write([brightness]*_num_led, _led)
+        write([brightness]*num_led, led)
         time.sleep(delay)
 
 
 # =====UTILITY FUNCTIONS=====
 
 
-def write(_data, _start_led=_leds["1r"], _reg=-1):
+def write(_data, start_led=_leds["1r"], reg=-1):
     """
     Writes new data to LED driver and automatically updates it
     :param _data: the data to send to the LED driver
-    :param _start_led: the first LED to interact with
-    :param _reg: the register to send data to on the LED driver
+    :param start_led: the first LED to interact with
+    :param reg: the register to send data to on the LED driver
     """
-    if _reg == 0x28:
-        bus.write_i2c_block_data(_driver_adr, _reg, _data)
-    elif _reg != -1:
-        bus.write_byte_data(_driver_adr, _reg, _data)
+    if reg == 0x28:
+        bus.write_i2c_block_data(_driver_adr, reg, _data)
+    elif reg != -1:
+        bus.write_byte_data(_driver_adr, reg, _data)
     else:
-        bus.write_i2c_block_data(_driver_adr, _start_led, _data)
+        bus.write_i2c_block_data(_driver_adr, start_led, _data)
 
     bus.write_byte_data(_driver_adr, _update_adr, 0x00)  # Sends update command to driver
 
@@ -177,13 +180,13 @@ def setup():
     global c_spectrum_temp
 
     # Turn on LEDs
-    write(0x01, _reg=_shutdown_adr)
+    write(0x01, reg=_shutdown_adr)
 
     # Activate LEDs at set current
     led_block = []
     for i in range(0, 25):
         led_block.append(_led_on_quart)  # To change current through LEDs edit the appended code
-    write(led_block, _reg=0x28)  # NOTE: 0x28 is the setup code for LED 1R
+    write(led_block, reg=0x28)  # NOTE: 0x28 is the setup code for LED 1R
 
     # Create color spectrum
     make_spectrum()
@@ -200,7 +203,9 @@ def test():
         while True:
             # spectrum_scroll()
             # long_spectrum_scroll()
-            spectrum_scroll_direction(-1)
+            # spectrum_scroll_direction(-1)
+            spectrum_scroll(4, -1, _leds["1r"])
+            spectrum_scroll(4, 1, _leds["5r"])
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
