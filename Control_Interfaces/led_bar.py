@@ -89,18 +89,17 @@ def make_spectrum(rate=8):
     decrease(_rate, 2)  # Changes color to RED
 
 
-def spectrum_scroll(num_led=8, dir=1, start_led=_leds["1r"]):
+def spectrum_scroll(num_led=8, dir=1):
     """
     Scrolls through entire color spectrum. Is defined by color shifting up by 1 LED
     :param num_led: the number of LEDs through which the transition will flow. Default/max is 8, min is 1
     :param dir: the direction of the scrolling. LEFT is NEGATIVE, RIGHT is POSITIVE
-    :param start_led: the first LED to interact with
     """
     temp = []
     for l in range(0, 8/num_led):
         temp += list(c_spectrum_temp)[l]
 
-    write(temp*num_led, start_led)
+    write(temp*num_led)
     c_spectrum_temp.rotate(dir)
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
@@ -201,11 +200,9 @@ def test():
     try:
         setup()
         while True:
-            # spectrum_scroll()
+            spectrum_scroll()
             # long_spectrum_scroll()
             # spectrum_scroll_direction(-1)
-            spectrum_scroll(4, -1, _leds["1r"])
-            spectrum_scroll(4, 1, _leds["5r"])
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
