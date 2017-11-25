@@ -204,17 +204,20 @@ def write(data, start_led=_leds["1r"], reg=-1):
     :param start_led: the first LED (or LEDs) to interact with
     :param reg: the register to send data to on the LED driver
     """
-    if reg == 0x28:  # Check for writing data to turn on lEDs or adjust current
+    if reg == 0x28:  # Executes if writing data to turn on lEDs or adjust current
         bus.write_i2c_block_data(_driver_adr, reg, data)
-    elif reg != -1:  # Check for writing to specific register (used for shutdown, activation, and reset)
+    elif reg != -1:  # Executes if writing to specific register (used for shutdown, activation, and reset)
         bus.write_byte_data(_driver_adr, reg, data)
-    elif type(data) not in [list, tuple]:
-        bus.write_byte_data(_driver_adr, start_led, data)
-    elif type(start_led) not in [list, tuple]:
-        bus.write_i2c_block_data(_driver_adr, start_led, data)
-    else:
+    elif type(start_led) is list and type(data) is not list:  # Executes if start_led is a LIST and data is SINGLE
         for led in start_led:
             bus.write_byte_data(_driver_adr, led, data)
+    elif type(start_led) is list:  # Executes if start_led is a LIST and data is a LIST
+        for led in start_led:
+            bus.write_i2c_block_data(_driver_adr, led, data)
+    elif type(data) is not list:  # Executes if start_led and data are SINGLE
+        bus.write_byte_data(_driver_adr, start_led, data)
+    else:  # Executes if start_led is SINGLE and data is a LIST
+        bus.write_i2c_block_data(_driver_adr, start_led, data)
 
     bus.write_byte_data(_driver_adr, _update_adr, 0x00)  # Sends update command to driver
 
