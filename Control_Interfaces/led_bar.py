@@ -233,6 +233,47 @@ def write(data, start_led=_leds["1r"], reg=-1):
     bus.write_byte_data(_driver_adr, _update_adr, 0x00)  # Sends update command to driver
 
 
+# =====NOTIFICATION FUNCTIONS=====
+
+
+def boot_notification():
+    print "Booting..."
+    boot_start = time.time()
+    while time.time() <= boot_start + 1:  # TODO: Update to 20
+        spectrum_scroll()
+    print "Booted"
+    write([0] * 24)
+
+
+def link_req_notification():
+    print "Asking for link..."
+    link_start = time.time()
+    while time.time() <= link_start + 1:  # TODO: Update to 5
+        # alternate_flash(_blue_leds, _red_leds, delay=0.125)
+        alternate_flash_soft(_blue_leds, _red_leds, delay=0.01)
+
+
+def success_notification():
+    print "Success!"
+    ack_start = time.time()
+    while time.time() <= ack_start + 1:
+        flash(_green_leds, 64, 0.25)
+
+
+def warning_notification():
+    print "Warning!"
+    warning_start = time.time()
+    while time.time() <= warning_start + 2:
+        flash(_red_leds + _green_leds, 64, 0.25)
+
+
+def error_notification():
+    print "ERROR!"
+    error_start = time.time()
+    while time.time() <= error_start + 2:
+        flash(_red_leds, 64, 0.125)
+
+
 # =====IMPLEMENTATION FUNCTIONS=====
 
 
@@ -286,27 +327,15 @@ def demo():
     setup()
 
     try:
-        print "Booting..."
-        boot_start = time.time()
-        # print boot_start  # Debug
-        while time.time() <= boot_start + 1:  # TODO: Update to 20
-            spectrum_scroll()
-        print "Booted"
-        write([0]*24)
+        boot_notification()
 
-        print "Asking for link..."
-        link_start = time.time()
-        # print link_start  # Debug
-        while time.time() <= link_start + 5:
-            # alternate_flash(_blue_leds, _red_leds, delay=0.125)
-            alternate_flash_soft(_blue_leds, _red_leds, delay=0.01)
-        print "Link received"
+        link_req_notification()
 
-        print "Link established"
-        ack_start = time.time()
-        # print ack_start  # Debug
-        while time.time() <= ack_start + 1:
-            flash(_green_leds, 64, 0.25)
+        success_notification()
+
+        warning_notification()
+
+        error_notification()
 
         clean()
     except KeyboardInterrupt:
