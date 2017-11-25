@@ -28,6 +28,10 @@ _leds = {"1r": 0x03, "1g": 0x04, "1b": 0x05, "2r": 0x06, "2g": 0x07, "2b": 0x08,
          "5r": 0x0F, "5g": 0x10, "5b": 0x11, "6r": 0x12, "6g": 0x13, "6b": 0x14,
          "7r": 0x15, "7g": 0x16, "7b": 0x17, "8r": 0x18, "8g": 0x19, "8b": 0x1A}
 
+_red_leds = [0x03, 0x06, 0x09, 0x0C, 0x0F, 0x12, 0x15, 0x18]
+_green_leds = [0x04, 0x07, 0x0A, 0x0D, 0x10, 0x13, 0x16, 0x19]
+_blue_leds = [0x05, 0x08, 0x0B, 0x0E, 0x11, 0x14, 0x17, 0x1A]
+
 # Brightness Spectrum
 b_spectrum = []
 for x in range(0, 256, 4):  # To change rate of brightness change, edit third parameter
@@ -142,20 +146,51 @@ def spectrum_scroll_direction(dir=1):
 # =====BRIGHTNESS FUNCTIONS=====
 
 
-def breathe(led=_leds["1r"], num_led=1):
+def breathe(led=_leds["1r"], num_led=1, delay=0.1):
     """
-    Function that breathes a set of LEDs based on their BRIGHTNESS
+    Breathes a set of LEDs based on their BRIGHTNESS
     :param led: the starting LED
     :param num_led: the number of LEDs after the start one that are to be changed as well
+    :param delay: the period length of the breathing (length of b_spectrum * delay)
     """
-    delay = 0.1
-
     for brightness in b_spectrum:  # Increase in brightness from off to max
-        write([brightness]*num_led, led)
+        if num_led != 1:
+            write([brightness]*num_led, led)
+        else:
+            write(brightness, led)
         time.sleep(delay)
     for brightness in reversed(b_spectrum):  # Decrease in brightness from max to off
-        write([brightness]*num_led, led)
+        if num_led != 1:
+            write([brightness]*num_led, led)
+        else:
+            write(brightness, led)
         time.sleep(delay)
+
+
+def flash(led=_leds["1r"], val=255, delay=0.1):
+    """
+    Flashes LEDs with given value.
+    NOTE: Handles the delay internally, just call in a loop.
+    :param led: the LED(s) to flash
+    :param val: the brightness of the LED (0-255, default is 255)
+    :param delay: the duty cycle of the LED(s)
+    """
+    write(val, led)
+    time.sleep(delay)
+    write(0, led)
+    time.sleep(delay)
+
+
+def alternate_flash(led1=_leds["1b"], led2=_leds["1r"], val=255, delay=0.1):
+    """
+    Flashes alternating colors
+    :param led1: the first LED(s) to flash
+    :param led2: the second LED(s) to flash
+    :param val: the brightness of the LED(s)
+    :param delay: the duty cycle of the LED(s)
+    """
+    flash(led1, val, delay)
+    flash(led2, val, delay)
 
 
 # =====UTILITY FUNCTIONS=====
@@ -165,14 +200,16 @@ def write(data, start_led=_leds["1r"], reg=-1):
     """
     Writes new data to LED driver and automatically updates it. If start_led is defined by a list of LEDs, then it will 
         scroll through the entire list.
-    :param data: the data to send to the LED driver
-    :param start_led: the first LED to interact with
+    :param data: the data to send to the LED driver. Make sure this data is in a list, even if it is one integer
+    :param start_led: the first LED (or LEDs) to interact with
     :param reg: the register to send data to on the LED driver
     """
-    if reg == 0x28:
+    if reg == 0x28:  # Check for writing data to turn on lEDs or adjust current
         bus.write_i2c_block_data(_driver_adr, reg, data)
-    elif reg != -1:
+    elif reg != -1:  # Check for writing to specific register (used for shutdown, activation, and reset)
         bus.write_byte_data(_driver_adr, reg, data)
+    elif type(data) not in [list, tuple]:
+        bus.write_byte_data(_driver_adr, start_led, data)
     elif type(start_led) not in [list, tuple]:
         bus.write_i2c_block_data(_driver_adr, start_led, data)
     else:
@@ -213,10 +250,13 @@ def test():
     try:
         setup()
         while True:
-            spectrum_scroll()
+            # spectrum_scroll()
             # long_spectrum_scroll()
             # spectrum_scroll_direction(-1)
             # write(255, [_leds["1b"], _leds["2b"], _leds["3b"], _leds["4b"]])
+            # breathe(_blue_leds, delay=0.05)
+            # flash()
+            alternate_flash(_blue_leds, _red_leds, delay=0.5)
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
