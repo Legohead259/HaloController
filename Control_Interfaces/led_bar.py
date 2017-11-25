@@ -1,6 +1,9 @@
+import math
 from smbus import SMBus
 from collections import deque
 import time
+from util import map
+import random
 
 
 # =====GLOBAL DEFINITIONS=====
@@ -233,45 +236,86 @@ def write(data, start_led=_leds["1r"], reg=-1):
     bus.write_byte_data(_driver_adr, _update_adr, 0x00)  # Sends update command to driver
 
 
+def purge():
+    write([0] * 24)
+
+
 # =====NOTIFICATION FUNCTIONS=====
 
 
 def boot_notification():
-    print "Booting..."
+    """
+    Executes while controller is booting. By default scrolls through the color SPECTRUM
+    """
+    print "Booting..."  # Debug
     boot_start = time.time()
-    while time.time() <= boot_start + 1:  # TODO: Update to 20
+    while time.time() <= boot_start + 20:
         spectrum_scroll()
     print "Booted"
-    write([0] * 24)
+    purge()
 
 
 def link_req_notification():
-    print "Asking for link..."
+    """
+    Executes when controller is requesting link with drone. By default soft flashes BLUE and RED
+    """
+    print "Asking for link..."  # Debug
     link_start = time.time()
-    while time.time() <= link_start + 1:  # TODO: Update to 5
+    while time.time() <= link_start + 5:
         # alternate_flash(_blue_leds, _red_leds, delay=0.125)
         alternate_flash_soft(_blue_leds, _red_leds, delay=0.01)
 
 
 def success_notification():
-    print "Success!"
+    """
+    Executes when action (link, maneuver, etc.) is completed successfully. By default hard flashes GREEN
+    """
+    print "Success!"  # Debug
     ack_start = time.time()
     while time.time() <= ack_start + 1:
         flash(_green_leds, 64, 0.25)
 
 
 def warning_notification():
-    print "Warning!"
+    """
+    Executes when there is a warning. By default hard flashes YELLOW
+    NOTE: A warning is defined by something that requires immediate user attention, but nothing has failed yet
+    """
+    print "Warning!"  # Debug
     warning_start = time.time()
     while time.time() <= warning_start + 2:
         flash(_red_leds + _green_leds, 64, 0.25)
 
 
-def error_notification():
-    print "ERROR!"
-    error_start = time.time()
-    while time.time() <= error_start + 2:
+def failure_notification():
+    """
+    Executes when there is an error. By default hard flashes RED
+    NOTE: A failure is defined as something that has broken operation (e.g. disconnection, battery dead, etc.)
+    :return:
+    """
+    print "FAILURE!"  # Debug
+    fail_start = time.time()
+    while time.time() <= fail_start + 2:
         flash(_red_leds, 64, 0.125)
+
+
+def battery_notification(bat_level):
+    """
+    Shows battery level in number of LEDs (0-8) on board and colors depending on level (GREEN for >= 50%,
+        YELLOW for < 50% but >= 25%, RED for < 25%)
+    :param bat_level: the raw voltage of the battery (3.3-4.2)
+    """
+    bat_led = int(round(map(bat_level, 3.3, 4.2, 0.0, 8.0)))
+    # print bat_led  # Debug
+
+    if bat_led >= 4:
+        leds = _green_leds[0:bat_led]
+    elif 2 <= bat_led < 4:
+        leds = _red_leds[0:bat_led] + _green_leds[0: bat_led]
+    else:
+        leds = _red_leds[0:bat_led]
+
+    write(64, leds)
 
 
 # =====IMPLEMENTATION FUNCTIONS=====
@@ -327,15 +371,23 @@ def demo():
     setup()
 
     try:
-        boot_notification()
+        # boot_notification()
+        #
+        # link_req_notification()
+        #
+        # success_notification()
+        #
+        # warning_notification()
+        #
+        # failure_notification()
 
-        link_req_notification()
-
-        success_notification()
-
-        warning_notification()
-
-        error_notification()
+        i = 3.3
+        while i < 4.2:
+            battery_notification(i)
+            # print i  # Debug
+            time.sleep(2)
+            purge()
+            i += .1
 
         clean()
     except KeyboardInterrupt:

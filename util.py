@@ -57,4 +57,4 @@ def map(x, in_min, in_max, out_min, out_max):
     :param out_max: the maximum of the output range
     :return: the value converted to the output range.
     """
-    return int((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
