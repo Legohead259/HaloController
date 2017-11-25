@@ -183,7 +183,7 @@ def flash(led=_leds["1r"], val=255, delay=0.1):
 
 def alternate_flash(led1=_leds["1b"], led2=_leds["1r"], val=255, delay=0.1):
     """
-    Flashes alternating colors
+    Flashes alternating colors HARSHLY (straight on/off)
     :param led1: the first LED(s) to flash
     :param led2: the second LED(s) to flash
     :param val: the brightness of the LED(s)
@@ -191,6 +191,17 @@ def alternate_flash(led1=_leds["1b"], led2=_leds["1r"], val=255, delay=0.1):
     """
     flash(led1, val, delay)
     flash(led2, val, delay)
+
+
+def alternate_flash_soft(led1=_leds["1b"], led2=_leds["1r"], delay=0.1):
+    """
+        Flashes alternating colors SOFTLY (breathes on/off)
+        :param led1: the first LED(s) to flash
+        :param led2: the second LED(s) to flash
+        :param delay: the duty cycle of the LED(s)
+        """
+    breathe(led1, delay=delay)
+    breathe(led2, delay=delay)
 
 
 # =====UTILITY FUNCTIONS=====
@@ -278,22 +289,24 @@ def demo():
         print "Booting..."
         boot_start = time.time()
         # print boot_start  # Debug
-        while time.time() <= boot_start + 10:
+        while time.time() <= boot_start + 1:  # TODO: Update to 20
             spectrum_scroll()
         print "Booted"
+        write([0]*24)
 
         print "Asking for link..."
         link_start = time.time()
         # print link_start  # Debug
         while time.time() <= link_start + 5:
-            alternate_flash(_blue_leds, _red_leds, delay=0.125)
+            # alternate_flash(_blue_leds, _red_leds, delay=0.125)
+            alternate_flash_soft(_blue_leds, _red_leds, delay=0.01)
         print "Link received"
 
         print "Link established"
         ack_start = time.time()
         # print ack_start  # Debug
         while time.time() <= ack_start + 1:
-            flash(_green_leds, delay=0.25)
+            flash(_green_leds, 64, 0.25)
 
         clean()
     except KeyboardInterrupt:
