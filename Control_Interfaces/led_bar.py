@@ -35,9 +35,7 @@ for x in range(0, 256, 4):  # To change rate of brightness change, edit third pa
 
 # Color Spectrum variables
 c_spectrum = []
-c_spectrum_d1 = deque()
-c_spectrum_d2 = deque()
-c_spectra = []
+c_spectrum_d = deque()
 color = [255, 0, 0]
 
 # Bus Creation
@@ -99,20 +97,20 @@ def spectrum_scroll(num_led=8, dir=1):
     """
     temp = []
     for l in range(0, 8/num_led):
-        temp += list(c_spectrum_d1)[l]
+        temp += list(c_spectrum_d)[l]
 
     write(temp*num_led)
-    c_spectrum_d1.rotate(dir)
+    c_spectrum_d.rotate(dir)
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
 
 def fancy_spectrum_scroll(num_led=2):
     temp = []
     for l in range(0, 8 / num_led):
-        temp += list(c_spectrum_d1)[l]
+        temp += list(c_spectrum_d)[l]
 
     write(temp+reversed(temp))
-    c_spectrum_d1.rotate(dir)
+    c_spectrum_d.rotate(dir)
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
 @DeprecationWarning
@@ -120,8 +118,8 @@ def long_spectrum_scroll():
     """
     Scrolls through entire color spectrum. Is defined by color shifting through ENTIRE bar
     """
-    write(c_spectrum_d1[1] * 8)
-    c_spectrum_d1.rotate()
+    write(c_spectrum_d[1] * 8)
+    c_spectrum_d.rotate()
     time.sleep(0.03125)
 
 
@@ -134,10 +132,10 @@ def spectrum_scroll_direction(dir=1):
     """
     temp = []
     for l in range(0, 8):
-        temp += list(c_spectrum_d1)[l]
+        temp += list(c_spectrum_d)[l]
 
     write(temp)
-    c_spectrum_d1.rotate(dir)
+    c_spectrum_d.rotate(dir)
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
 
 
@@ -163,19 +161,23 @@ def breathe(led=_leds["1r"], num_led=1):
 # =====UTILITY FUNCTIONS=====
 
 
-def write(_data, start_led=_leds["1r"], reg=-1):
+def write(data, start_led=_leds["1r"], reg=-1):
     """
-    Writes new data to LED driver and automatically updates it
-    :param _data: the data to send to the LED driver
+    Writes new data to LED driver and automatically updates it. If start_led is defined by a list of LEDs, then it will 
+        scroll through the entire list.
+    :param data: the data to send to the LED driver
     :param start_led: the first LED to interact with
     :param reg: the register to send data to on the LED driver
     """
     if reg == 0x28:
-        bus.write_i2c_block_data(_driver_adr, reg, _data)
+        bus.write_i2c_block_data(_driver_adr, reg, data)
     elif reg != -1:
-        bus.write_byte_data(_driver_adr, reg, _data)
+        bus.write_byte_data(_driver_adr, reg, data)
+    elif type(start_led) not in [list, tuple]:
+        bus.write_i2c_block_data(_driver_adr, start_led, data)
     else:
-        bus.write_i2c_block_data(_driver_adr, start_led, _data)
+        for led in start_led:
+            bus.write_byte_data(_driver_adr, led, data)
 
     bus.write_byte_data(_driver_adr, _update_adr, 0x00)  # Sends update command to driver
 
@@ -187,7 +189,7 @@ def setup():
     """
     Sets up LED driver with proper power settings and initializes any global variable necessary for operation
     """
-    global c_spectrum_d1, c_spectrum_d2
+    global c_spectrum_d
 
     # Turn on LEDs
     write(0x01, reg=_shutdown_adr)
@@ -200,10 +202,7 @@ def setup():
 
     # Create color spectrum
     make_spectrum()
-    c_spectrum_d1 = deque(c_spectrum)
-    c_spectrum_d2 = deque(c_spectrum)
-    c_spectra.append(c_spectrum_d1)
-    c_spectra.append(c_spectrum_d2)
+    c_spectrum_d = deque(c_spectrum)
 
 
 def test():
@@ -217,6 +216,7 @@ def test():
             spectrum_scroll()
             # long_spectrum_scroll()
             # spectrum_scroll_direction(-1)
+            # write(255, [_leds["1b"], _leds["2b"], _leds["3b"], _leds["4b"]])
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
