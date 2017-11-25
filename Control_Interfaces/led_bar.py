@@ -1,9 +1,7 @@
-import math
 from smbus import SMBus
 from collections import deque
 import time
 from util import map
-import random
 
 
 # =====GLOBAL DEFINITIONS=====
@@ -119,6 +117,7 @@ def fancy_spectrum_scroll(num_led=2):
     write(temp+reversed(temp))
     c_spectrum_d.rotate(dir)
     time.sleep(0.03125)  # Sets period length (length of rainbow colors * delay)
+
 
 @DeprecationWarning
 def long_spectrum_scroll():
@@ -308,9 +307,9 @@ def battery_notification(bat_level):
     bat_led = int(round(map(bat_level, 3.3, 4.2, 0.0, 8.0)))
     # print bat_led  # Debug
 
-    if bat_led >= 4:
+    if bat_led > 4:
         leds = _green_leds[0:bat_led]
-    elif 2 <= bat_led < 4:
+    elif 2 < bat_led <= 4:
         leds = _red_leds[0:bat_led] + _green_leds[0: bat_led]
     else:
         leds = _red_leds[0:bat_led]
