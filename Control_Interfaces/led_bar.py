@@ -247,8 +247,8 @@ def setup():
 
 def test():
     """
-    Basic testing to ensure functionality of any operation
-    NOTE: To test operation, place command in the while loop
+    Basic testing to ensure functionality of any operation.
+    NOTE: To operate, just call - the while loop is implemented natively
     """
     try:
         setup()
@@ -260,6 +260,42 @@ def test():
             # breathe(_blue_leds, delay=0.05)
             # flash()
             alternate_flash(_blue_leds, _red_leds, delay=0.5)
+    except KeyboardInterrupt:
+        print "Exiting..."
+    finally:
+        print "Cleaning..."
+        clean()
+
+
+def demo():
+    """
+    Demonstration to show off functionality
+    NOTE: To operate, place command in a while loop
+    """
+    setup()
+
+    try:
+        print "Booting..."
+        boot_start = time.time()
+        # print boot_start  # Debug
+        while time.time() <= boot_start + 10:
+            spectrum_scroll()
+        print "Booted"
+
+        print "Asking for link..."
+        link_start = time.time()
+        # print link_start  # Debug
+        while time.time() <= link_start + 5:
+            alternate_flash(_blue_leds, _red_leds, delay=0.125)
+        print "Link received"
+
+        print "Link established"
+        ack_start = time.time()
+        # print ack_start  # Debug
+        while time.time() <= ack_start + 1:
+            flash(_green_leds, delay=0.25)
+
+        clean()
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
