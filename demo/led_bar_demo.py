@@ -1,4 +1,3 @@
-from led_bar import *
 import Control_Interfaces.led_bar as led_bar
 import time
 
