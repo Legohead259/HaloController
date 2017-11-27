@@ -327,6 +327,10 @@ def battery_notification(bat_level):
 
 
 def morse(msg):
+    """
+    Flashes a message in morse code on the LED bar
+    :param msg: the message to be flashes
+    """
     dot = .1
     dash = 3 * dot
     word_space = 7 * dot
@@ -348,6 +352,13 @@ def morse(msg):
 
 
 def determine_delays(code, dot, dash):
+    """
+    Determines the delays necessary for the letter being transmitted
+    :param code: the code for the letter
+    :param dot: the dot unit length
+    :param dash: the dash unit length
+    :return: the delay code for the letter
+    """
     delays = []
     for char in code:
         if char == ".":
