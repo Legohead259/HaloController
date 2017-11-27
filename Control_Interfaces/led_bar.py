@@ -245,10 +245,11 @@ def purge():
 def boot_notification():
     """
     Executes while controller is booting. By default scrolls through the color SPECTRUM
+    NOTE: Need to execute setup() before operation
     """
     print "Booting..."  # Debug
     boot_start = time.time()
-    while time.time() <= boot_start + 20:
+    while time.time() <= boot_start + 5:
         spectrum_scroll()
     print "Booted"
     purge()
@@ -257,6 +258,7 @@ def boot_notification():
 def link_req_notification():
     """
     Executes when controller is requesting link with drone. By default soft flashes BLUE and RED
+    NOTE: Need to execute setup() before operation
     """
     print "Asking for link..."  # Debug
     link_start = time.time()
@@ -268,6 +270,7 @@ def link_req_notification():
 def success_notification():
     """
     Executes when action (link, maneuver, etc.) is completed successfully. By default hard flashes GREEN
+    NOTE: Need to execute setup() before operation
     """
     print "Success!"  # Debug
     ack_start = time.time()
@@ -279,6 +282,7 @@ def warning_notification():
     """
     Executes when there is a warning. By default hard flashes YELLOW
     NOTE: A warning is defined by something that requires immediate user attention, but nothing has failed yet
+    NOTE: Need to execute setup() before operation
     """
     print "Warning!"  # Debug
     warning_start = time.time()
@@ -290,7 +294,7 @@ def failure_notification():
     """
     Executes when there is an error. By default hard flashes RED
     NOTE: A failure is defined as something that has broken operation (e.g. disconnection, battery dead, etc.)
-    :return:
+    NOTE: Need to execute setup() before operation
     """
     print "FAILURE!"  # Debug
     fail_start = time.time()
@@ -302,6 +306,7 @@ def battery_notification(bat_level):
     """
     Shows battery level in number of LEDs (0-8) on board and colors depending on level (GREEN for >= 50%,
         YELLOW for < 50% but >= 25%, RED for < 25%)
+    NOTE: Need to execute setup() before operation
     :param bat_level: the raw voltage of the battery (3.3-4.2)
     """
     bat_led = int(round(map(bat_level, 3.3, 4.2, 0.0, 8.0)))
@@ -370,15 +375,15 @@ def demo():
     setup()
 
     try:
-        # boot_notification()
-        #
-        # link_req_notification()
-        #
-        # success_notification()
-        #
-        # warning_notification()
-        #
-        # failure_notification()
+        boot_notification()
+
+        link_req_notification()
+
+        success_notification()
+
+        warning_notification()
+
+        failure_notification()
 
         i = 3.3
         while i < 4.2:
