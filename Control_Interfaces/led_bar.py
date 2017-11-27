@@ -169,18 +169,19 @@ def breathe(led=_leds["1r"], num_led=1, delay=0.1):
         time.sleep(delay)
 
 
-def flash(led=_leds["1r"], val=255, delay=0.1):
+def flash(led=_leds["1r"], val=255, delay_on=0.1, delay_off=0.1):
     """
     Flashes LEDs with given value.
     NOTE: Handles the delay internally, just call in a loop.
     :param led: the LED(s) to flash
     :param val: the brightness of the LED (0-255, default is 255)
-    :param delay: the duty cycle of the LED(s)
+    :param delay_on: the time LEDs are on
+    :param delay_off: the time LEDs are off
     """
     write(val, led)
-    time.sleep(delay)
+    time.sleep(delay_on)
     write(0, led)
-    time.sleep(delay)
+    time.sleep(delay_off)
 
 
 def alternate_flash(led1=_leds["1b"], led2=_leds["1r"], val=255, delay=0.1):
@@ -322,6 +323,40 @@ def battery_notification(bat_level):
     write(64, leds)
 
 
+# =====EASTER EGG FUNCTIONS=====
+
+
+def morse(msg):
+    dot = .1
+    dash = 3 * dot
+    word_space = 7 * dot
+
+    codes = {"a": ".-", "b": "-...", "c": "-.-.", "d": "-..", "e": ".", "f": "..-.", "g": "--.", "h": "....", "i": "..",
+             "j": ".---", "k": "-.-", "l": ".-..", "m": "--", "n": "-.", "o": "---", "p": ".--.", "q": "--.-",
+             "r": ".-.", "s": "...", "t": "-", "u": "..-", "v": "...-", "w": ".--", "x": "-..-", "y": "-.--",
+             "z": "--..", "0": "-----", "1": ".----", "2": "..---", "3": "...--", "4": "....-", "5": ".....",
+             "6": "-....", "7": "--...", "8": "---..", "9": "----."}
+
+    for char in msg:
+        if not char.isspace():
+            delays = determine_delays(codes[char.lower()], dot, dash)
+            for unit in delays:
+                flash(_blue_leds, val=64, delay_on=unit, delay_off=dot)
+                time.sleep(dash)
+        else:
+            time.sleep(word_space)
+
+
+def determine_delays(code, dot, dash):
+    delays = []
+    for char in code:
+        if char == ".":
+            delays.append(dot)
+        else:
+            delays.append(dash)
+    return delays
+
+
 # =====IMPLEMENTATION FUNCTIONS=====
 
 
@@ -348,7 +383,7 @@ def setup():
 def test():
     """
     Basic testing to ensure functionality of any operation.
-    NOTE: To operate, just call - the while loop is implemented natively
+    NOTE: To operate, just call - the while loop and setup() is implemented natively
     """
     try:
         setup()
@@ -359,7 +394,8 @@ def test():
             # write(255, [_leds["1b"], _leds["2b"], _leds["3b"], _leds["4b"]])
             # breathe(_blue_leds, delay=0.05)
             # flash()
-            alternate_flash(_blue_leds, _red_leds, delay=0.5)
+            # alternate_flash(_blue_leds, _red_leds, delay=0.5)
+            morse("Hello World")
     except KeyboardInterrupt:
         print "Exiting..."
     finally:
