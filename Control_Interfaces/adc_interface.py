@@ -1,7 +1,7 @@
 from smbus import SMBus
 from util import map
 
-# =====START VARIABLE DEFINITIONS=====
+# =====VARIABLE DEFINITIONS=====
 
 adr = 0x33
 
@@ -14,7 +14,7 @@ values_pwm = []
 bus = SMBus(1)
 
 
-# =====START CRITICAL FUNCTIONS=====
+# =====CRITICAL FUNCTIONS=====
 
 
 def parse(data):
@@ -77,7 +77,7 @@ def parse_to_pwm(data):
     print values_pwm  # Debug
 
 
-# =====START UTILITY FUNCTIONS=====
+# =====UTILITY FUNCTIONS=====
 
 
 def update():
@@ -127,7 +127,7 @@ def get_pwm():
     return values_pwm
 
 
-# =====START EXAMPLE=====
+# =====EXAMPLE=====
 
 
 # bus.write_byte(adr, setup)
