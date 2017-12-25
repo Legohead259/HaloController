@@ -331,6 +331,8 @@ def morse(msg):
     Flashes a message in morse code on the LED bar
     :param msg: the message to be flashes
     """
+    print "Flashing:", msg  # Debug
+
     dot = .1
     dash = 3 * dot
     word_space = 7 * dot

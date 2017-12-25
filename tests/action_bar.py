@@ -1,20 +1,26 @@
 from kivy.base import runTouchApp
+from kivy.core.window import Window
 from kivy.lang import Builder
 
+Window.size = (480, 320)
+
 runTouchApp(Builder.load_string('''
+#: import os os
+
 ActionBar:
-    pos_hint: {'top':1}
+    pos_hint: {'bottom':1}
     ActionView:
+        background_color: [7, 53, 226, 1]
+        background_image: 
         use_separator: True
         ActionPrevious:
-            title: 'Action Bar'
+            title: 'Halo Controller'
+            app_icon: os.path.abspath("icons/DroneIcon.png") 
             with_previous: False
-        ActionOverflow:
         ActionButton:
             text: 'Btn0'
         ActionButton:
             text: 'Btn1'
-            on-: print "you pressed boutan 1"
         ActionButton:
             text: 'Btn2'
         ActionButton:
@@ -22,11 +28,13 @@ ActionBar:
         ActionButton:
             text: 'Btn4'
         ActionGroup:
-            text: 'Group1'
+            text: 'Maneuvers'
             ActionButton:
-                text: 'Btn5'
+                text: 'Orbit'
             ActionButton:
-                text: 'Btn6'
+                text: 'Spiral'
             ActionButton:
-                text: 'Btn7'
+                text: 'Follow Me'
+            ActionButton:
+                text: 'Follow This'
 '''))
