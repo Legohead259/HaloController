@@ -1,6 +1,8 @@
 import json
 import os
 
+import requests
+
 os.chdir("..")
 loc = os.path.abspath("Settings.json")
 with open(loc) as settings_file:
@@ -58,3 +60,10 @@ def map(x, in_min, in_max, out_min, out_max):
     :return: the value converted to the output range.
     """
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+
+def get_controller_geo_ip():
+    send_url = 'http://freegeoip.net/json'
+    r = requests.get(send_url)
+    j = json.loads(r.text)
+    return j['latitude'], j['longitude']

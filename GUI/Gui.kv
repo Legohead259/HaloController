@@ -49,10 +49,10 @@
     Header:
 
 <Map>:
-    lat: 40.597919
-    lon: -105.09034099999997
     zoom: 13
     double_tap_zoom: True
+    DroneIcon:
+
 
 <ActionBar>:
     pos_hint: {'bottom':1}
@@ -63,8 +63,10 @@
         HomeButton:
         ActionGroup:
             text: 'Maneuvers'
-            ActionButton:
+            ManeuverButton:
                 text: 'Orbit'
+                on_press:
+                    self.update_marker_data(self.text)
             ActionButton:
                 text: 'Spiral'
             ActionButton:

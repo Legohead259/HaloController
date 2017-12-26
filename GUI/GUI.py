@@ -6,11 +6,11 @@ import os
 from kivy.properties import StringProperty
 from kivy.uix.actionbar import ActionPrevious
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager
 
-from libs.garden import MapMarker
-from libs.garden.mapview import MapView
 from util import Colors, settings
+
+from Screens.Map import MapScreen, ManeuverButton
 
 colors = Colors()
 
@@ -36,40 +36,40 @@ class HomeButton(ActionPrevious):
 class Header(GridLayout):
     top_left = os.path.abspath("icons/CockpitTL.png")
     drone_gps = StringProperty(os.path.abspath("icons/GPSIcon.png"))
-    drone_battery = StringProperty(os.path.abspath("icons/Battery.png"))
+    drone_battery = StringProperty(os.path.abspath("icons/BatteryFull.png"))
     drone_connection = StringProperty(os.path.abspath("icons/DroneNo.png"))
 
     top_right = os.path.abspath("icons/CockpitTR.png")
     controller_gps = StringProperty(os.path.abspath("icons/GPSIcon.png"))
-    wifi_connection = StringProperty(os.path.abspath("icons/ConnectionIconNone.png"))
-    controller_battery = StringProperty(os.path.abspath("icons/Battery.png"))
+    wifi_connection = StringProperty(os.path.abspath("icons/WiFiFull.png"))
+    controller_battery = StringProperty(os.path.abspath("icons/Battery25.png"))
 
-    def update_gps(self):
-        self.gps = os.path.abspath("icons/MissingTexture.png")
+    def update_drone_gps(self):
+        # TODO: Implement drone GPS strength
+        self.drone_gps = os.path.abspath("icons/MissingTexture.png")
 
+    def update_drone_battery(self):
+        # TODO: Implement drone battery strength
+        self.drone_battery = ""
 
-class MapScreen(Screen):
-    pass
+    def update_drone_connection(self):
+        # TODO: Implement drone connection strength
+        self.drone_connection = ""
 
+    def update_controller_gps(self):
+        # TODO: Implement controller gps strength
+        self.controller_gps = ""
 
-class Map(MapView):
-    pass
+    def update_wifi(self):
+        # TODO: Implement wifi connection strength
+        self.wifi_connection = ""
 
-
-class ManeuverIcon(MapMarker):
-    pass
-
-
-class DroneIcon(MapMarker):
-    pass
-
-
-class ControllerIcon(MapMarker):
-    pass
+    def update_controller_battery(self):
+        # TODO: Implement controller battery strength
+        self.controller_battery = ""
 
 
 ms = MapScreen()
-m = Map()
 sm = ScreenManager()
 sm.switch_to(ms)
 
@@ -79,9 +79,6 @@ class GUIApp(App):
     title = "Halo Controller"
 
     def build(self):
-        # os.chdir("..")
-        # os.chdir("GUI")
-        print os.path.abspath("")
         return sm
 
 
