@@ -48,7 +48,8 @@ def on_slide(instance, value):
         label_hl.text = "Low:" + str(int(value)) + "m" # TODO: Substitute with user defined unit
     elif instance is slider_hh:
         label_hh.text = "High:" + str(int(value)) + "m"  # TODO: Substitute with user defined unit
-        instance.value = slider_hl.value + 1
+        if slider_hl.value > instance.value:
+            instance.value = slider_hl.value + 1
 
 
 class ManeuverMarker(MapMarkerPopup):
