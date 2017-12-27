@@ -52,8 +52,10 @@
                 text: 'Orbit'
                 on_press:
                     self.update_marker_data(self.text)
-            ActionButton:
+            ManeuverButton:
                 text: 'Spiral'
+                on_press:
+                    self.update_marker_data(self.text)
             ActionButton:
                 text: 'Follow Me'
             ActionButton:
@@ -63,9 +65,3 @@
 <MapScreen>:
 <Map>:
     zoom: 15
-    ManeuverMarker:
-        Bubble:
-            GridLayout:
-                rows: 3
-                Label:
-                    text:

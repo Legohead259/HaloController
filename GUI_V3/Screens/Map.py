@@ -18,6 +18,7 @@ from util import settings, get_controller_geo_ip
 
 coord_enabled = False
 maneuver_icon = os.path.abspath("icons/MissingTexture.png")
+maneuver_name = ""
 
 try:
     """Put anything that requires an internet connection for the map here
@@ -30,24 +31,24 @@ except ConnectionError:
     """
     print bcolors.FAIL + "Failed to connect!" + bcolors.ENDC
 
-content = None
 slider_d = Slider()
 slider_hl = Slider(orientation="vertical")
 slider_hh = Slider(orientation="vertical")
 label_d = Label(text="Diameter:" + str(int(slider_d.value)) + "m")  # TODO: Substitute with user defined unit
-label_hl = Label(text="Lowest altitude:" + str(int(slider_hl.value)) + "m")  # TODO: Substitute with user defined unit
-label_hh = Label(text="Highest altitude:" + str(int(slider_hh.value)) + "m")  # TODO: Substitute with user defined unit
-button = Button(text="Execute")
-popup = None
+label_hl = Label(text="Low:" + str(int(slider_hl.value)) + "m")  # TODO: Substitute with user defined unit
+label_hh = Label(text="High:" + str(int(slider_hh.value)) + "m")  # TODO: Substitute with user defined unit
+button_exec = Button(text="Execute")
+button_next = Button(text="Next")
 
 
 def on_slide(instance, value):
     if instance is slider_d:
         label_d.text = "Diameter:" + str(int(value)) + "m"  # TODO: Substitute with user defined unit
     elif instance is slider_hl:
-        label_hl.text = "Lowest Altitude:" + str(int(value)) + "m" # TODO: Substitute with user defined unit
+        label_hl.text = "Low:" + str(int(value)) + "m" # TODO: Substitute with user defined unit
     elif instance is slider_hh:
-        label_hh.text = "Highest Altitude:" + str(int(value)) + "m"  # TODO: Substitute with user defined unit
+        label_hh.text = "High:" + str(int(value)) + "m"  # TODO: Substitute with user defined unit
+        instance.value = slider_hl.value + 1
 
 
 class ManeuverMarker(MapMarkerPopup):
@@ -77,10 +78,14 @@ class Map(MapView):
 
 
 class MapScreen(Screen):
+    content = Widget()
+    diameter_slide = GridLayout(rows=3)
+    height_slide_top = GridLayout(rows=2, cols=2)
+    height_slide = GridLayout(rows=2)
+
     def __init__(self, **kwargs):
         super(MapScreen, self).__init__(**kwargs)
         self.map = Map()
-        print self.map.scale  # Debug
         self.header = Header()
         self.footer = Footer()
         self.drone = DroneMarker()
@@ -110,35 +115,64 @@ class MapScreen(Screen):
             self.maneuver.lat, self.maneuver.lon = self.map.get_latlon_at(touch.x, touch.y, self.map.zoom)
             self.maneuver.source = maneuver_icon
             self.map.trigger_update(False)
-            popup.open()
+            self.create_popup().open()
             coord_enabled = False
         else:
             super(MapScreen, self).on_touch_down(touch)
+
+    def create_popup(self):
+        self.content.clear_widgets()
+        self.diameter_slide.clear_widgets()
+        self.height_slide_top.clear_widgets()
+        self.height_slide.clear_widgets()
+
+        if maneuver_name == "Orbit":
+            self.content = GridLayout(rows=3)
+            self.content.add_widget(label_d)
+            self.content.add_widget(slider_d)
+            button_exec.size_hint_y = 1
+            self.content.add_widget(button_exec)
+        elif maneuver_name == "Spiral":
+            self.content = Carousel(direction="right")
+
+            self.diameter_slide.add_widget(label_d)
+            self.diameter_slide.add_widget(slider_d)
+            self.diameter_slide.add_widget(button_next)
+
+            label_hl.size_hint_y = .25
+            self.height_slide_top.add_widget(label_hl)
+            label_hh.size_hint_y = .25
+            self.height_slide_top.add_widget(label_hh)
+            self.height_slide_top.add_widget(slider_hl)
+            self.height_slide_top.add_widget(slider_hh)
+
+            self.height_slide.add_widget(self.height_slide_top)
+            button_exec.size_hint_y = .25
+            self.height_slide.add_widget(button_exec)
+
+            self.content.add_widget(self.diameter_slide)
+            self.content.add_widget(self.height_slide)
+
+            button_next.bind(on_press=self.content.load_next)
+
+        popup = Popup(title="%s Maneuver" % maneuver_name, title_align="center", content=self.content,
+                      size_hint=(None, None), size=(200, 300), auto_dismiss=False)
+        button_exec.bind(on_press=popup.dismiss)
+        slider_d.bind(value=on_slide)
+        slider_hl.bind(value=on_slide)
+        slider_hh.bind(value=on_slide)
+
+        return popup
 
 
 class ManeuverButton(ActionButton):
     @staticmethod
     def update_marker_data(m):
-        global maneuver_icon, coord_enabled, content, popup
-        content = GridLayout(rows=3)
+        global coord_enabled, maneuver_name
 
-        if m == "Orbit":
-            maneuver_icon = os.path.abspath("icons/MissingTexture.png")
+        if m == "Orbit" or m == "Spiral":
             coord_enabled = True
-
-            content.add_widget(label_d)
-            content.add_widget(slider_d)
-            content.add_widget(button)
-        elif m == "Spiral":
-            maneuver_icon = os.path.abspath("icons/MissingTexture.png")
-            coord_enabled = True
-
-            content.cols = 2
-            content.add_widget(label_hl)
-            content.add_widget(label_hh)
-            content.add_widget(slider_hl)
-            content.add_widget(slider_hh)
-            content.add_widget(button)
+            # print coord_enabled  # Debug
         elif m == "Follow Me":
             # TODO: Implement follow_me()
             pass
@@ -146,10 +180,4 @@ class ManeuverButton(ActionButton):
             # TODO: Implement follow_this()
             pass
 
-        popup = Popup(title="%s Maneuver" % m, title_align="center", content=content,
-                      size_hint=(None, None), size=(200, 200), auto_dismiss=False)
-        button.bind(on_press=popup.dismiss)
-        popup.bind(on_dismiss=content.clear_widgets)
-        slider_d.bind(value=on_slide)
-        slider_hl.bind(value=on_slide)
-        slider_hh.bind(value=on_slide)
+        maneuver_name = m
