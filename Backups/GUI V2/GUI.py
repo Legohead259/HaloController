@@ -68,6 +68,17 @@ class Header(GridLayout):
         # TODO: Implement controller battery strength
         self.controller_battery = ""
 
+    def update(self):
+        """
+        Wrapper for updating the header icons
+        """
+        self.update_drone_gps()
+        self.update_drone_battery()
+        self.update_drone_connection()
+        self.update_controller_gps()
+        self.update_wifi()
+        self.update_controller_battery()
+
 
 ms = MapScreen()
 sm = ScreenManager()

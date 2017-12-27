@@ -49,9 +49,18 @@
     Header:
 
 <Map>:
-    zoom: 13
+    zoom: 16
     double_tap_zoom: True
     DroneIcon:
+        width: self.w
+        height: self.h
+    ManeuverIcon:
+        width: self.w
+        height: self.h
+        source: root.marker_source
+        opacity: root.maneuver_opacity
+        lat: root.marker_lat
+        lon: root.marker_lon
 
 
 <ActionBar>:
