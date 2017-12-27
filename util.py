@@ -7,7 +7,7 @@ os.chdir("..")
 loc = os.path.abspath("Settings.json")
 with open(loc) as settings_file:
     settings = json.load(settings_file)
-os.chdir("GUI")
+os.chdir("GUI_V3")
 
 
 class Colors:
@@ -40,13 +40,6 @@ class Colors:
             count += 1
         con_val.append(val[3])
         return con_val
-
-
-def next_screen(cs, s, sm):
-    temp = cs
-    temp += 1
-    sm.switch_to(s[temp], direction="left")
-    return temp
 
 
 def map(x, in_min, in_max, out_min, out_max):

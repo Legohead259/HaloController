@@ -1,5 +1,5 @@
 from kivy.uix.screenmanager import Screen
 
 
-class FlightStats(Screen):
+class FlightStatsScreen(Screen):
     pass

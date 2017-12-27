@@ -40,3 +40,32 @@
         Image:
             id: controller_battery
             source: root.controller_battery
+
+<ActionBar>:
+    pos_hint: {'bottom':1}
+    ActionView:
+        use_separator: True
+        HomeButton:
+        ActionGroup:
+            text: 'Maneuvers'
+            ManeuverButton:
+                text: 'Orbit'
+                on_press:
+                    self.update_marker_data(self.text)
+            ActionButton:
+                text: 'Spiral'
+            ActionButton:
+                text: 'Follow Me'
+            ActionButton:
+                text: 'Follow This'
+
+<FlightStatsScreen>:
+<MapScreen>:
+<Map>:
+    zoom: 15
+    ManeuverMarker:
+        Bubble:
+            GridLayout:
+                rows: 3
+                Label:
+                    text:
